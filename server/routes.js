@@ -2,32 +2,43 @@ import config from "./config.js";
 import controller from "./controller.js";
 import { logger } from "./utils.js";
 
+const sendFile = async (filePath = '', res) => {
+  const startedController = controller.run()
+  const file = await startedController.getFileStream(filePath)
+  const contentType = config.constants.contentType[file.type];
+
+  if (!!contentType) res.writeHead(200, {
+    'Content-Type': contentType,
+  });
+  
+  return file.stream.pipe(res);
+}
+
+const redirect = (res) => {
+  res.writeHead(302, {
+      Location: config.location.home,
+  });
+  return res.end();
+}
 
 const routes = async (req, res) => {
-  const startedController = controller.run()
   const { pages } = config
   
   switch (req.method) {
     case 'GET':
       switch (req.url) {
         case '/':
-          res.writeHead(302, {
-            'Location': config.location.home
-          })
-          return res.end()
+          return redirect(res);
         
         case '/home':
-          const homePageFile = await startedController.getFileStream(pages.home)
-          return homePageFile.stream.pipe(res);
+          return sendFile(pages.home, res);
         
         case '/controller':
-          const controllerPageFile = await startedController.getFileStream(pages.controller)
-          return controllerPageFile.stream.pipe(res);
+          return sendFile(pages.controller, res);
       
         default:
           try {
-            const { stream } = await startedController.getFileStream(req.url)
-            return stream.pipe(res)
+            return sendFile(req.url, res)
           } catch (err) {
             const notFoundPageMsg = 'Page not found.'
             res.writeHead(404,notFoundPageMsg )

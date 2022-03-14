@@ -32,7 +32,7 @@ export default {
     contentType: {
       '.html': 'text/html',
       '.css': 'text/css',
-      '.js': 'text/javascript'
+      '.js': 'application/javascript'
     }
   }
 }
