@@ -27,5 +27,12 @@ export default {
   },
   location: {
     home: '/home'
+  },
+  constants: {
+    contentType: {
+      '.html': 'text/html',
+      '.css': 'text/css',
+      '.js': 'text/javascript'
+    }
   }
 }
