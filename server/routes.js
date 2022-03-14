@@ -1,6 +1,8 @@
 import config from "./config.js";
-import controller from "./controller.js";
+import { Controller } from "./controller.js";
 import { logger } from "./utils.js";
+
+const controller = new Controller()
 
 const sendFile = async (filePath = '', res) => {
   const file = await controller.getFileStream(filePath)

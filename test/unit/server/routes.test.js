@@ -1,6 +1,6 @@
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import config from '../../../server/config'
-import controller from '../../../server/controller'
+import { Controller } from '../../../server/controller'
 import { handler } from '../../../server/routes'
 import testUtil from '../utils/testUtil'
 
@@ -9,7 +9,7 @@ describe('#Routes', () => {
     jest.resetAllMocks()
     jest.clearAllMocks()
   })
-  
+
   test('GET / ~ Should redirect to home page', async () => {
     const params = testUtil.defaultHandleParams()
     params.request.method = 'GET'
@@ -31,26 +31,47 @@ describe('#Routes', () => {
     params.request.method = 'GET'
     params.request.url = '/home'
     const mockFileStream = testUtil.generateReadableStream(['data'])
-  
+    
     jest.spyOn(
-      controller,
-      controller.getFileStream.name
+      Controller.prototype,
+      'getFileStream'
     ).mockResolvedValue({
       stream: mockFileStream
     })
-  
-    jest.spyOn(
+    const spyFileStream = jest.spyOn(
       mockFileStream,
       'pipe'
     ).mockReturnValue()
   
     await handler(...params.values())
 
-    expect(controller.getFileStream).toBeCalledWith(config.page.home)
-    expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
+    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.home);
+    expect(spyFileStream).toHaveBeenCalledWith(params.response);
   });
 
-  test.todo(`GET /controller ~ Should respond with ${config.page.controller} file stream`)
+  test(`GET /controller ~ Should respond with ${config.page.controller} file stream`,   async () => {
+    const params = testUtil.defaultHandleParams()
+    params.request.method = 'GET'
+    params.request.url = '/controller'
+    const mockFileStream = testUtil.generateReadableStream(['data'])
+    
+    jest.spyOn(
+      Controller.prototype,
+      'getFileStream'
+    ).mockResolvedValue({
+      stream: mockFileStream
+    })
+    const spyFileStream = jest.spyOn(
+      mockFileStream,
+      'pipe'
+    ).mockReturnValue()
+  
+    await handler(...params.values())
+
+    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.controller);
+    expect(spyFileStream).toHaveBeenCalledWith(params.response);
+  })
+   
   test.todo('GET /file.ext ~ Should respond with file stream')
   test.todo('GET /unknow ~ Should respond with 404')
 
