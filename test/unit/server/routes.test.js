@@ -45,8 +45,8 @@ describe('#Routes', () => {
   
     await handler(...params.values())
 
-    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.home);
-    expect(spyFileStream).toHaveBeenCalledWith(params.response);
+    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.home)
+    expect(spyFileStream).toHaveBeenCalledWith(params.response)
   });
 
   test(`GET /controller ~ Should respond with ${config.page.controller} file stream`,   async () => {
@@ -61,18 +61,48 @@ describe('#Routes', () => {
     ).mockResolvedValue({
       stream: mockFileStream
     })
-    const spyFileStream = jest.spyOn(
+    jest.spyOn(
       mockFileStream,
       'pipe'
     ).mockReturnValue()
   
     await handler(...params.values())
 
-    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.controller);
-    expect(spyFileStream).toHaveBeenCalledWith(params.response);
+    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.controller)
+    expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
   })
    
-  test.todo('GET /file.ext ~ Should respond with file stream')
+  test('GET /file.ext ~ Should respond with file stream',  async () => {
+    const expectedType = '.html'
+    const params = testUtil.defaultHandleParams()
+    params.request.method = 'GET'
+    params.request.url = `/index${expectedType}`
+    const mockFileStream = testUtil.generateReadableStream(['data'])
+    
+    jest.spyOn(
+      Controller.prototype,
+      'getFileStream'
+    ).mockResolvedValue({
+      stream: mockFileStream,
+      type: expectedType
+    })
+    jest.spyOn(
+      mockFileStream,
+      'pipe'
+    ).mockReturnValue()
+  
+    await handler(...params.values())
+
+    expect(Controller.prototype.getFileStream).toBeCalledWith(params.request.url)
+    expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
+    expect(params.response.writeHead).toHaveBeenCalledWith(
+      200,
+      {
+        'Content-Type': config.constant.contentType[expectedType]
+      }
+    )
+  })
+
   test.todo('GET /unknow ~ Should respond with 404')
 
   describe('Excepetions', () => {
