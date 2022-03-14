@@ -1,18 +1,12 @@
 import fs, {promises as fsPromises} from 'fs'
 import { extname } from 'path';
 import { getPath } from './config.js';
-import { logger } from './utils.js';
 
 const createFileStream = (filePath = '') => fs.createReadStream(filePath)
 
 const getFileInfo = async (fileName = '') => {
   const publicFilePath = getPath(`public/${fileName}`)
-  
-  try {
-    await fsPromises.access(publicFilePath)
-  } catch (err) {
-    throw new Error(err)
-  }
+  await fsPromises.access(publicFilePath)
 
   return {
     type: extname(publicFilePath),
@@ -21,15 +15,11 @@ const getFileInfo = async (fileName = '') => {
 }
 
 const getFileStream = async (fileName = '') => {
-  try {
-    const { path, type } = await getFileInfo(fileName)
-    
-    return {
-      stream: createFileStream(path),
-      type
-    }
-  } catch (err) {
-    throw new Error(err)
+  const { path, type } = await getFileInfo(fileName)
+  
+  return {
+    stream: createFileStream(path),
+    type
   }
 }
 

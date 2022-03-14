@@ -41,6 +41,18 @@ const routes = async (req, res) => {
   }
 }
 
-export const handler = (req, res) => routes(req, res)
-  .catch(err => logger.error(`Server error:${err.stack}`))
+const handleError = (err, res) => {
+  if (err.message.includes('ENOENT')) {
+    const enoentErrorMsg = `Asset not found ${err.stack}`;
+    logger.warn(enoentErrorMsg);
+    res.writeHead(404, enoentErrorMsg);
+    return res.end()
+  }
+
+  logger.error(`Internal error: ${err.stack}`)
+  res.writeHead(500)
+  return res.end()
+}
+
+export const handler = (req, res) => routes(req, res).catch((err) => handleError(err, res));
 
