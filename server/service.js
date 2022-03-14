@@ -11,7 +11,7 @@ const getFileInfo = async (fileName = '') => {
   try {
     await fsPromises.access(publicFilePath)
   } catch (err) {
-    logger.error(err)
+    throw new Error(err)
   }
 
   return {
@@ -21,11 +21,15 @@ const getFileInfo = async (fileName = '') => {
 }
 
 const getFileStream = async (fileName = '') => {
-  const { path, type } = await getFileInfo(fileName)
-  
-  return {
-    stream: createFileStream(path),
-    type
+  try {
+    const { path, type } = await getFileInfo(fileName)
+    
+    return {
+      stream: createFileStream(path),
+      type
+    }
+  } catch (err) {
+    throw new Error(err)
   }
 }
 
