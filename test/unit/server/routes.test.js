@@ -103,7 +103,16 @@ describe('#Routes', () => {
     )
   })
 
-  test.todo('GET /unknow ~ Should respond with 404')
+  test('GET /unknow ~ Should respond with 404',  async () => {
+    const params = testUtil.defaultHandleParams()
+    params.request.method = 'GET'
+    params.request.url = `/unknow`
+    
+    await handler(...params.values())
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Page not found.')
+    expect(params.response.end).toHaveBeenCalled()
+  })
 
   describe('Excepetions', () => {
     test.todo('Given inexistent file it should respond with 404')

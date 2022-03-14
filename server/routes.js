@@ -6,6 +6,11 @@ const controller = new Controller()
 
 const sendFile = async (filePath = '', res) => {
   const file = await controller.getFileStream(filePath)
+  
+  if (!file) {
+    return null
+  }
+
   const contentType = config.constant.contentType[file.type];
 
   if (!!contentType) res.writeHead(200, {
@@ -24,7 +29,7 @@ const redirect = (res) => {
 
 const routes = async (req, res) => {
   const { page } = config
-  
+
   switch (req.method) {
     case 'GET':
       switch (req.url) {
@@ -38,13 +43,16 @@ const routes = async (req, res) => {
           return sendFile(page.controller, res);
       
         default:
-          try {
-            return sendFile(req.url, res)
-          } catch (err) {
+          const result = await sendFile(req.url, res);
+          
+          if (!result) {
             const notFoundPageMsg = 'Page not found.'
-            res.writeHead(404,notFoundPageMsg )
+            res.writeHead(404, notFoundPageMsg)
             return res.end(notFoundPageMsg)
           }
+          
+          return result
+
       }
   
     default:
