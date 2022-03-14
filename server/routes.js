@@ -3,9 +3,8 @@ import controller from "./controller.js";
 import { logger } from "./utils.js";
 
 const sendFile = async (filePath = '', res) => {
-  const startedController = controller.run()
-  const file = await startedController.getFileStream(filePath)
-  const contentType = config.constants.contentType[file.type];
+  const file = await controller.getFileStream(filePath)
+  const contentType = config.constant.contentType[file.type];
 
   if (!!contentType) res.writeHead(200, {
     'Content-Type': contentType,
@@ -22,7 +21,7 @@ const redirect = (res) => {
 }
 
 const routes = async (req, res) => {
-  const { pages } = config
+  const { page } = config
   
   switch (req.method) {
     case 'GET':
@@ -31,10 +30,10 @@ const routes = async (req, res) => {
           return redirect(res);
         
         case '/home':
-          return sendFile(pages.home, res);
+          return sendFile(page.home, res);
         
         case '/controller':
-          return sendFile(pages.controller, res);
+          return sendFile(page.controller, res);
       
         default:
           try {

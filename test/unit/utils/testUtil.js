@@ -43,5 +43,7 @@ const defaultHandleParams = () => {
 }
 
 export default {
-  defaultHandleParams
+  defaultHandleParams,
+  generateReadableStream,
+  generateWritableStream
 }

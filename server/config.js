@@ -21,14 +21,14 @@ export default {
     songs: getPath('audio/songs'),
     fx: getPath('audio/fx')
   },
-  pages: {
+  page: {
     home: 'home/index.html',
     controller: 'controller/index.html'
   },
   location: {
     home: '/home'
   },
-  constants: {
+  constant: {
     contentType: {
       '.html': 'text/html',
       '.css': 'text/css',
