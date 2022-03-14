@@ -115,7 +115,27 @@ describe('#Routes', () => {
   })
 
   describe('Excepetions', () => {
-    test.todo('Given inexistent file it should respond with 404')
+    test('Given inexistent file it should respond with 404', async () => {
+    const params = testUtil.defaultHandleParams()
+    params.request.method = 'GET'
+    params.request.url = `/photo.png`
+    
+    const mockFileStream = testUtil.generateReadableStream(['data'])
+    
+    jest.spyOn(
+      Controller.prototype,
+      'getFileStream'
+    ).mockRejectedValue(new Error('Error ENOENT: no such file or directory.'))
+    jest.spyOn(
+      mockFileStream,
+      'pipe'
+    ).mockReturnValue()
+      
+    await handler(...params.values())
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Asset not found.')
+    expect(params.response.end).toHaveBeenCalled()
+  })
     test.todo('Given an error it should respond with 500')
   })
 })

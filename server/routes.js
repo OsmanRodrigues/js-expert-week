@@ -63,7 +63,7 @@ const routes = async (req, res) => {
 
 const handleError = (err, res) => {
   if (err.message.includes('ENOENT')) {
-    const enoentErrorMsg = `Asset not found ${err.stack}`;
+    const enoentErrorMsg = `Asset not found.`;
     logger.warn(enoentErrorMsg);
     res.writeHead(404, enoentErrorMsg);
     return res.end()
