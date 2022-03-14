@@ -70,7 +70,7 @@ const handleError = (err, res) => {
   }
 
   logger.error(`Internal error: ${err.stack}`)
-  res.writeHead(500)
+  res.writeHead(500, 'Internal error.')
   return res.end()
 }
 

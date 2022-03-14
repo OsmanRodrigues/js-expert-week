@@ -116,26 +116,33 @@ describe('#Routes', () => {
 
   describe('Excepetions', () => {
     test('Given inexistent file it should respond with 404', async () => {
-    const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
-    params.request.url = `/photo.png`
-    
-    const mockFileStream = testUtil.generateReadableStream(['data'])
-    
-    jest.spyOn(
-      Controller.prototype,
-      'getFileStream'
-    ).mockRejectedValue(new Error('Error ENOENT: no such file or directory.'))
-    jest.spyOn(
-      mockFileStream,
-      'pipe'
-    ).mockReturnValue()
-      
-    await handler(...params.values())
+      const params = testUtil.defaultHandleParams()
+      params.request.method = 'GET'
+      params.request.url = `/photo.png`
+      jest.spyOn(
+        Controller.prototype,
+        'getFileStream'
+      ).mockRejectedValue(new Error('Error ENOENT: no such file or directory.'))
+        
+      await handler(...params.values())
 
-    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Asset not found.')
-    expect(params.response.end).toHaveBeenCalled()
-  })
-    test.todo('Given an error it should respond with 500')
+      expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Asset not found.')
+      expect(params.response.end).toHaveBeenCalled()
+    })
+
+    test('Given an error it should respond with 500', async () => {
+      const params = testUtil.defaultHandleParams()
+      params.request.method = 'GET'
+      params.request.url = `/photo.png`
+      jest.spyOn(
+        Controller.prototype,
+        'getFileStream'
+      ).mockRejectedValue(new Error('Error: '))
+        
+      await handler(...params.values())
+
+      expect(params.response.writeHead).toHaveBeenCalledWith(500, 'Internal error.')
+      expect(params.response.end).toHaveBeenCalled()
+    })
   })
 })
