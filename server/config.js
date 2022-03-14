@@ -1,7 +1,7 @@
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
-const getPath = (pathName='') => {
+export const getPath = (pathName='') => {
   const currUrl = fileURLToPath(import.meta.url)
   const currDir = dirname(currUrl)
   const rootPathName = '../'
