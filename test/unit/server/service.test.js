@@ -24,10 +24,26 @@ describe('#Service', () => {
     )
     
     const service = new Service()
-    service.createFileStream(expectedFilePath)
+    const expectedFileStream = service.createFileStream(expectedFilePath)
 
     expect(fs.createReadStream).toBeCalledWith(expectedFilePath)
+    expect(expectedFileStream).resolves.toStrictEqual(mockFileStream)
   })
-  test.todo('getFileInfo')
+  test('getFileInfo', async () => {
+    const expectedFileName = page.controller
+    const expectedFilePath = getPath(`public/${page.controller}`)
+    const expectedFileType = constant.fileExt.html
+
+    jest.spyOn(
+      fsPromises,
+      'access'
+    ).mockResolvedValue()
+
+    const service = new Service()
+    const expectedFileInfo = await service.getFileInfo(expectedFileName)
+
+    expect(fsPromises.access).toHaveBeenCalledWith(expectedFilePath)
+    expect(expectedFileInfo).toStrictEqual({type: expectedFileType, path: expectedFilePath})
+  })
   test.todo('getFileStream')
 })

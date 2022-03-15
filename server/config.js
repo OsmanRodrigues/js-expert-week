@@ -39,6 +39,11 @@ export const config = {
       '.html': 'text/html',
       '.css': 'text/css',
       '.js': 'application/javascript'
+    },
+    fileExt: {
+      html: '.html',
+      css: '.css',
+      js: '.js'
     }
   }
 }
