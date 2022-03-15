@@ -22,11 +22,17 @@ export default {
     fx: getPath('audio/fx')
   },
   page: {
-    home: 'home/index.html',
-    controller: 'controller/index.html'
+    home: '/home/index.html',
+    controller: '/controller/index.html'
   },
   location: {
-    home: '/home'
+    main: '/',
+    home: '/home',
+    controller: '/controller'
+  },
+  method: {
+    get: 'GET',
+    post: 'POST'
   },
   constant: {
     contentType: {
