@@ -4,11 +4,11 @@ import { getPath } from './config.js';
 
 export class Service {
 
-  createFileStream(filePath = '') {
+  createFileStream(filePath ) {
     return fs.createReadStream(filePath)
   } 
   
-  async getFileInfo(fileName = ''){
+  async getFileInfo(fileName){
     const publicFilePath = getPath(`public/${fileName}`)
     await fsPromises.access(publicFilePath)
   
@@ -18,7 +18,7 @@ export class Service {
     }
   }
   
-  async getFileStream(fileName = ''){
+  async getFileStream(fileName){
     const { path, type } = await this.getFileInfo(fileName)
     
     return {

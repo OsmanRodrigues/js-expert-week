@@ -4,7 +4,7 @@ import { logger } from "./utils.js"
 
 const controller = new Controller()
 
-const sendFile = async (filePath = '', res) => {
+const sendFile = async (filePath , res) => {
   const file = await controller.getFileStream(filePath)
   const contentType = config.constant.contentType[file.type]
 
