@@ -32,7 +32,7 @@ describe('#Service', () => {
   test('getFileInfo', async () => {
     const expectedFileName = page.controller
     const expectedFilePath = getPath(`public/${page.controller}`)
-    const expectedFileType = constant.fileExt.html
+    const expectedFileExt = constant.fileExt.html
 
     jest.spyOn(
       fsPromises,
@@ -43,7 +43,34 @@ describe('#Service', () => {
     const expectedFileInfo = await service.getFileInfo(expectedFileName)
 
     expect(fsPromises.access).toHaveBeenCalledWith(expectedFilePath)
-    expect(expectedFileInfo).toStrictEqual({type: expectedFileType, path: expectedFilePath})
+    expect(expectedFileInfo).toStrictEqual({ type: expectedFileExt, path: expectedFilePath })
   })
-  test.todo('getFileStream')
+  test('getFileStream', async () => {
+    const expectedFileName = page.home
+    const expectedFilePath = getPath(`public/${page.home}`)
+    const expectedFileExt = constant.fileExt.html;
+    const mockFileStream = testUtil.generateReadableStream(['data'])
+
+    jest.spyOn(
+      Service.prototype,
+      'getFileInfo'
+    ).mockResolvedValue({
+      path: expectedFilePath,
+      type: expectedFileExt
+    })
+
+    jest.spyOn(
+      Service.prototype,
+      'createFileStream'
+    ).mockReturnValue(
+      mockFileStream
+    )
+
+    const service = new Service()
+    const expectedFileStream = await service.getFileStream(expectedFileName)
+    
+    expect(Service.prototype.getFileInfo).toHaveBeenCalledWith(expectedFileName)
+    expect(Service.prototype.createFileStream).toHaveBeenCalledWith(expectedFilePath)
+    expect(expectedFileStream).toStrictEqual({ stream: mockFileStream, type: expectedFileExt })
+  })
 })

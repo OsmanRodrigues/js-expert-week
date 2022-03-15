@@ -19,7 +19,7 @@ export class Service {
   }
   
   async getFileStream(fileName = ''){
-    const { path, type } = await getFileInfo(fileName)
+    const { path, type } = await this.getFileInfo(fileName)
     
     return {
       stream: this.createFileStream(path),
