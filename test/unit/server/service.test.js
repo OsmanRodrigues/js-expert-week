@@ -12,7 +12,7 @@ describe('#Service', () => {
     jest.clearAllMocks()
   })
 
-  test('createFileStream', () => {
+  test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
     const expectedFilePath = getPath(page.home)
     const mockFileStream = testUtil.generateReadableStream(['data'])
     
@@ -29,7 +29,10 @@ describe('#Service', () => {
     expect(fs.createReadStream).toBeCalledWith(expectedFilePath)
     expect(expectedFileStream).resolves.toStrictEqual(mockFileStream)
   })
-  test('getFileInfo', async () => {
+  
+  test(
+    'getFileInfo() ~ Should call fsPromises.access and return an object with type and path',
+    async () => {
     const expectedFileName = page.controller
     const expectedFilePath = getPath(`public/${page.controller}`)
     const expectedFileExt = constant.fileExt.html
@@ -45,7 +48,10 @@ describe('#Service', () => {
     expect(fsPromises.access).toHaveBeenCalledWith(expectedFilePath)
     expect(expectedFileInfo).toStrictEqual({ type: expectedFileExt, path: expectedFilePath })
   })
-  test('getFileStream', async () => {
+  
+  test(
+    'getFileStream() ~ Should call getFileInfo and createFileStream, returning an object with stream and type',
+    async () => {
     const expectedFileName = page.home
     const expectedFilePath = getPath(`public/${page.home}`)
     const expectedFileExt = constant.fileExt.html;

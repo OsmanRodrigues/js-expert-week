@@ -127,7 +127,7 @@ describe('#Routes', () => {
     expect(params.response.end).toHaveBeenCalled()
   })
 
-  describe('Excepetions', () => {
+  describe('Exceptions', () => {
     test('Given inexistent file it should respond with 404', async () => {
       const params = testUtil.defaultHandleParams()
       params.request.method = method.get
