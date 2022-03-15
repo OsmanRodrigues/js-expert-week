@@ -73,10 +73,10 @@ describe('#Routes', () => {
   })
    
   test('GET /file.ext ~ Should respond with file stream',  async () => {
-    const expectedType = '.html'
+    const expectedType = '.css'
     const params = testUtil.defaultHandleParams()
     params.request.method = 'GET'
-    params.request.url = `/index${expectedType}`
+    params.request.url = `/home/css/styles${expectedType}`
     const mockFileStream = testUtil.generateReadableStream(['data'])
     
     jest.spyOn(
@@ -111,6 +111,17 @@ describe('#Routes', () => {
     await handler(...params.values())
 
     expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Page not found.')
+    expect(params.response.end).toHaveBeenCalled()
+  })
+
+  test('POST /unknow ~ Should respond with 404 Method not found',  async () => {
+    const params = testUtil.defaultHandleParams()
+    params.request.method = 'POST'
+    params.request.url = `/unknow`
+    
+    await handler(...params.values())
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Method not found.')
     expect(params.response.end).toHaveBeenCalled()
   })
 
