@@ -42,7 +42,7 @@ const defaultHandleParams = () => {
   }
 }
 
-export default {
+export const testUtil = {
   defaultHandleParams,
   generateReadableStream,
   generateWritableStream

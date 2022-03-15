@@ -1,4 +1,4 @@
-import service from "./service.js"
+import { service } from "./service.js"
 
 export class Controller {
   async getFileStream(fileName = '') {

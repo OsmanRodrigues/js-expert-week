@@ -12,7 +12,7 @@ export const getPath = (pathName='') => {
   return join(root, pathName)
 }
 
-export default {
+export const config = {
   port: Number(process.env.PORT) || 3000,
   dir: {
     root: getPath(),

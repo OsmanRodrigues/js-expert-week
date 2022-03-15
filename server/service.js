@@ -23,7 +23,7 @@ const getFileStream = async (fileName = '') => {
   }
 }
 
-export default {
+export const service = {
   createFileStream,
   getFileInfo,
   getFileStream
