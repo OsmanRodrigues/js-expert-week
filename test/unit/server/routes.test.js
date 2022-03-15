@@ -1,8 +1,10 @@
-import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import config from '../../../server/config'
+import testUtil from '../utils/testUtil'
+import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller'
 import { handler } from '../../../server/routes'
-import testUtil from '../utils/testUtil'
+
+const { method, location, page, constant } = config
 
 describe('#Routes', () => {
   beforeEach(() => {
@@ -10,26 +12,26 @@ describe('#Routes', () => {
     jest.clearAllMocks()
   })
 
-  test('GET / ~ Should redirect to home page', async () => {
+  test(`${method.get} ${location.main} ~ Should redirect to home page`, async () => {
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
-    params.request.url = '/'
+    params.request.method = method.get
+    params.request.url = location.main
 
     await handler(...params.values())
 
     expect(params.response.writeHead).toBeCalledWith(
       302,
       {
-        'Location': config.location.home
+        'Location': location.home
       }
     )
     expect(params.response.end).toBeCalled()
   })
 
-  test(`GET /home ~ Should respond with ${config.page.home} file stream`, async () => {
+  test(`${method.get} ${location.home} ~ Should respond with ${page.home} file stream`, async () => {
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
-    params.request.url = '/home'
+    params.request.method = method.get
+    params.request.url = location.home
     const mockFileStream = testUtil.generateReadableStream(['data'])
     
     jest.spyOn(
@@ -45,37 +47,37 @@ describe('#Routes', () => {
   
     await handler(...params.values())
 
-    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.home)
+    expect(Controller.prototype.getFileStream).toBeCalledWith(page.home)
     expect(spyFileStream).toHaveBeenCalledWith(params.response)
-  });
+  })
 
-  test(`GET /controller ~ Should respond with ${config.page.controller} file stream`,   async () => {
+  test(`${method.get} ${location.controller} ~ Should respond with ${page.controller} file stream`, async () => {
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
-    params.request.url = '/controller'
+    params.request.method = method.get
+    params.request.url = location.controller
     const mockFileStream = testUtil.generateReadableStream(['data'])
-    
+
     jest.spyOn(
       Controller.prototype,
       'getFileStream'
     ).mockResolvedValue({
-      stream: mockFileStream
+      stream: mockFileStream,
     })
     jest.spyOn(
       mockFileStream,
       'pipe'
     ).mockReturnValue()
-  
+
     await handler(...params.values())
 
-    expect(Controller.prototype.getFileStream).toBeCalledWith(config.page.controller)
+    expect(Controller.prototype.getFileStream).toBeCalledWith(page.controller)
     expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
   })
    
-  test('GET /file.ext ~ Should respond with file stream',  async () => {
+  test(`${method.get} /file.ext ~ Should respond with file stream`,  async () => {
     const expectedType = '.css'
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
+    params.request.method = method.get
     params.request.url = `/home/css/styles${expectedType}`
     const mockFileStream = testUtil.generateReadableStream(['data'])
     
@@ -98,14 +100,14 @@ describe('#Routes', () => {
     expect(params.response.writeHead).toHaveBeenCalledWith(
       200,
       {
-        'Content-Type': config.constant.contentType[expectedType]
+        'Content-Type': constant.contentType[expectedType]
       }
     )
   })
 
-  test('GET /unknow ~ Should respond with 404',  async () => {
+  test(`${method.get} /unknow ~ Should respond with 404`,  async () => {
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'GET'
+    params.request.method = method.get
     params.request.url = `/unknow`
     
     await handler(...params.values())
@@ -114,9 +116,9 @@ describe('#Routes', () => {
     expect(params.response.end).toHaveBeenCalled()
   })
 
-  test('POST /unknow ~ Should respond with 404 Method not found',  async () => {
+  test(`${method.post} /unknow ~ Should respond with 404 Method not found`,  async () => {
     const params = testUtil.defaultHandleParams()
-    params.request.method = 'POST'
+    params.request.method = method.post
     params.request.url = `/unknow`
     
     await handler(...params.values())
@@ -128,8 +130,8 @@ describe('#Routes', () => {
   describe('Excepetions', () => {
     test('Given inexistent file it should respond with 404', async () => {
       const params = testUtil.defaultHandleParams()
-      params.request.method = 'GET'
-      params.request.url = `/photo.png`
+      params.request.method = method.get
+      params.request.url = `/home/assets/photo.png`
       jest.spyOn(
         Controller.prototype,
         'getFileStream'
@@ -143,8 +145,8 @@ describe('#Routes', () => {
 
     test('Given an error it should respond with 500', async () => {
       const params = testUtil.defaultHandleParams()
-      params.request.method = 'GET'
-      params.request.url = `/photo.png`
+      params.request.method = method.get
+      params.request.url = `/home/assets/photo.png`
       jest.spyOn(
         Controller.prototype,
         'getFileStream'
