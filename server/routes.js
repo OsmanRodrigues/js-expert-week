@@ -1,6 +1,7 @@
 import { config } from "./config.js"
 import { Controller } from "./controller.js"
 import { logger } from "./utils.js"
+import { once } from 'events'
 
 const controller = new Controller()
 
@@ -61,7 +62,22 @@ const routes = async (req, res) => {
           return res.end(notFoundPageMsg)
         
       }
-  
+      
+    case method.post:
+      switch (true) {
+
+        case req.url.includes(location.controller):
+          const data = await once(req, 'data')
+          const parsedData = JSON.parse(data)
+          const result = controller.handleStreamingCommand(parsedData)
+          const parsedResult = JSON.stringify(result)
+          
+          return res.end(parsedResult)
+      
+        default:
+          break;
+      }
+
     default:
       res.writeHead(404, 'Method not found.')
       return res.end()
