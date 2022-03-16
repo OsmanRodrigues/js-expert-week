@@ -18,8 +18,6 @@ export class Service {
     this.currentReadable = {}
     this.currentBitRate = 0
     this.currentStreamingFilePath = ''
-    
-    this.startStreaming() //To test
   }
 
   createClientStream() {
@@ -95,7 +93,7 @@ export class Service {
 
   async startStreaming() {
     this.currentStreamingFilePath = constant.audio.file.englishConversation.dir
-    logger.info(`Starting streaming of ${this.currentStreamingFilePath}`)
+    logger.info(`Starting streaming of ${this.currentStreamingFilePath}.`)
     this.currentBitRate = (await this.getBitRate(this.currentStreamingFilePath)) / constant.audio.bitRateDivisor
     this.throttleTransform = new Throttle(this.currentBitRate)
     this.currentReadable = this.createFileStream(this.currentStreamingFilePath)
@@ -105,6 +103,18 @@ export class Service {
       this.throttleTransform,
       this.broadCast()
     )
+  }
+
+  stopStreaming() {
+    if (!this.throttleTransform?._writableState) {
+      logger.info('Streaming not started yet.')
+    }
+    else if (!this.throttleTransform?._writableState.ended) {
+      this.throttleTransform.end()
+      logger.info('Streaming stopped succesfully.')
+    } else {
+      logger.info('Streaming already stopped.');
+    }
   }
 
   createFileStream(filePath ) {
