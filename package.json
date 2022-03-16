@@ -10,7 +10,7 @@
     "test": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache",
     "test-watch": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache --watchAll",
     "test-coverage": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache --coverage test/unit",
-    "dev-docker": "docker-compose up spotify-radio"
+    "dev-docker": "docker-compose up --build spotify-radio"
   },
   "engines": {
     "node": "17"
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "pino": "^7.8.0",
-    "pino-pretty": "^7.5.3"
+    "pino-pretty": "^7.5.3",
+    "throttle": "^1.0.3"
   }
 }

@@ -54,6 +54,7 @@ export const config = {
       mediaType: 'mp3',
       songVolume: '0.99',
       fallbackBitRate: '128000',
+      bitRateDivisor: 8,
       file: {
         englishConversation: {
           dir: getPath('/audio/songs/conversation.mp3')
