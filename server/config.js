@@ -44,6 +44,16 @@ export const config = {
       html: '.html',
       css: '.css',
       js: '.js'
+    },
+    audio: {
+      mediaType: 'mp3',
+      songVolume: '0.99',
+      fallbackBitRate: '128000',
+      file: {
+        englishConversation: {
+          dir: getPath('/audio/songs/conversation.mp3')
+        }
+      }
     }
   }
 }
