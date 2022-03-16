@@ -23,8 +23,8 @@ const redirect = (res) => {
 }
 
 const routes = async (req, res) => {
-  const { page, location, method } = config
-
+  const { page, location, method, constant } = config
+  
   switch (req.method) {
 
     case method.get:
@@ -41,6 +41,19 @@ const routes = async (req, res) => {
             
         case req.url.includes(location.home) || req.url.includes(location.controller):
           return sendFile(req.url, res)
+        
+        case req.url.includes(location.stream):
+          const {
+            stream,
+            onClose
+          } = controller.createClientStream()
+          req.once('close', onClose)
+          res.writeHead(200, {
+            'Content-Type': constant.contentType[".mpeg"],
+            'Accept-Ranges': constant.acceptRanges.bytes
+          })
+
+          return stream.pipe(res)
         
         default:
           const notFoundPageMsg = 'Page not found.'

@@ -28,7 +28,8 @@ export const config = {
   location: {
     main: '/',
     home: '/home',
-    controller: '/controller'
+    controller: '/controller',
+    stream: '/stream'
   },
   method: {
     get: 'GET',
@@ -38,7 +39,11 @@ export const config = {
     contentType: {
       '.html': 'text/html',
       '.css': 'text/css',
-      '.js': 'application/javascript'
+      '.js': 'application/javascript',
+      '.mpeg': 'audio/mpeg'
+    },
+    acceptRanges: {
+      bytes: 'bytes'
     },
     fileExt: {
       html: '.html',
