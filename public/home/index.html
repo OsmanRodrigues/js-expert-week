@@ -147,7 +147,7 @@
     </div>
 
     <div class="audio-player">
-      <audio id="audio" preload="none" controls autoplay></audio>
+      <audio id="audio" preload="none" controls></audio>
 
       <div class="player-controls">
         <div class="player__actions">
@@ -177,7 +177,7 @@
     //bypass prevent browser cache
     window.onload = () => {
       const streamUrlWithMockId = `/stream?id=${Date.now()}`
-      document.getElementById('audio').src = '/stream?id=' + Date.now()
+      document.getElementById('audio').src = streamUrlWithMockId
     }
   </script>
 </body>
