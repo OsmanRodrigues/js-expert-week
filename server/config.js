@@ -60,6 +60,11 @@ export const config = {
           dir: getPath('/audio/songs/conversation.mp3')
         }
       }
+    },
+    util: {
+      test: {
+        retentionDataPeriod: 200,
+      }
     }
   }
 }
