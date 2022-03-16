@@ -10,6 +10,25 @@ export class Controller {
   async getFileStream(fileName){
     return this.service.getFileStream(fileName)
   }
+
+  handleStreamingCommand({ command }) {
+    logger.info(`Command received: ${command}`)
+    const safeCommand = command.toLowerCase()
+
+    switch (true) {
+      case safeCommand.includes('start'):
+        this.service.startStreaming()
+        return { result: 'started' }
+      
+      case safeCommand.includes('stop'):
+        this.service.stopStreaming()
+        return { result: 'stopped' }
+      
+      default:
+        return { result: 'command not found' }
+    }
+
+  }
   
   createClientStream() {
     const { 
