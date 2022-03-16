@@ -14,5 +14,45 @@ services:
       - node_modules:/spotify-radio/node_modules
     ports:
       - 3000:3000
+
+  test:
+    image: spotify-radio
+    build: .
+    command: 
+      - npm
+      - run
+      - test
+    volumes:
+      - .:/spotify-radio
+      - node_modules:/spotify-radio/node_modules
+    ports:
+      - 3000:3000
+
+  test-watch:
+    image: spotify-radio
+    build: .
+    command: 
+      - npm
+      - run
+      - test-watch
+    volumes:
+      - .:/spotify-radio
+      - node_modules:/spotify-radio/node_modules
+    ports:
+      - 3000:3000
+
+  test-coverage:
+    image: spotify-radio
+    build: .
+    command: 
+      - npm
+      - run
+      - test-coverage
+    volumes:
+      - .:/spotify-radio
+      - node_modules:/spotify-radio/node_modules
+    ports:
+      - 3000:3000
+
 volumes:
   node_modules: {}
