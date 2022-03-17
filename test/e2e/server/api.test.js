@@ -108,22 +108,31 @@ describe('#API e2e', () => {
     })
 
     describe('Exceptions', () => {
-      test(`When access a inexistent endpoint, it should receive not found error and 
-      status code 404`, async () => {
+      test(`When access a inexistent route, should receive not found error and status code 404`, async () => {
         const server = await getTestServer(apiServer)
-        const endpoint = '/foo'
-        const result = await server.testServer.get(endpoint)
+        const inexistentRoute = '/foo'
+        const result = await server.testServer.get(inexistentRoute)
         const expectedStatusCode = statusCode['NOT_FOUND']
         const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]
-        console.log(result.text)
         
         expect(result.statusCode).toStrictEqual(expectedStatusCode)
         expect(result.text).toStrictEqual(expectedFallback)
 
         server.kill()
       })
-      test.todo('It should receive method not allowed error and status code 405')
-      test.todo('It should receive internal server error and status code 500')
+
+      test(`When access a inexistent file, should receive not found error and status code 404`, async () => {
+        const server = await getTestServer(apiServer)
+        const inexistentFilePath = '/home/assets/photo.png'
+        const result = await server.testServer.get(inexistentFilePath)
+        const expectedStatusCode = statusCode['NOT_FOUND']
+        const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode].toLowerCase()
+        
+        expect(result.statusCode).toStrictEqual(expectedStatusCode)
+        expect(result.text).toContain(expectedFallback)
+
+        server.kill()
+      })
     })
   })
 })

@@ -5,9 +5,11 @@ import { once } from 'events'
 
 const controller = new Controller()
 
+const { page, location, method, constant, statusCode } = config
+
 const sendFile = async (filePath , res) => {
   const file = await controller.getFileStream(filePath)
-  const contentType = config.constant.contentType[file.type]
+  const contentType = constant.contentType[file.type]
 
   if (!!contentType) res.writeHead(200, {
     'Content-Type': contentType,
@@ -24,8 +26,6 @@ const redirect = (res) => {
 }
 
 const routes = async (req, res) => {
-  const { page, location, method, constant, statusCode } = config
-  
   switch (req.method) {
 
     case method.get:
@@ -81,23 +81,30 @@ const routes = async (req, res) => {
       }
 
     default:
-      res.writeHead(404, 'Method not found.')
-      return res.end()
+      const code = statusCode['METHOD_NOT_ALLOWED']
+      const notAllowedMessage = constant.fallback.route.statusCode[code]
+      
+      res.writeHead(code)
+      return res.end(notAllowedMessage)
   }
 
 }
 
 const handleError = (err, res) => {
   if (err.message.includes('ENOENT')) {
+    const code = statusCode['NOT_FOUND']
     const enoentErrorMsg = `Asset not found.`
     logger.warn(enoentErrorMsg)
-    res.writeHead(404, enoentErrorMsg)
-    return res.end()
+    res.writeHead(code)
+    
+    return res.end(enoentErrorMsg)
   }
 
-  logger.error(`Internal error: ${err.stack}`)
-  res.writeHead(500, 'Internal error.')
-  return res.end()
+  const code = statusCode['INTERNAL_SERVER_ERROR']
+  const internalErrorMessage = constant.fallback.route.statusCode[code]
+  logger.error(`${internalErrorMessage}: ${err.stack}`)
+  res.writeHead(code)
+  return res.end(internalErrorMessage)
 }
 
 export const handler = (req, res) => routes(req, res).catch((err) => handleError(err, res))

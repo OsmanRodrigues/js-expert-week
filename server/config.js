@@ -95,7 +95,8 @@ export const config = {
     fallback: {
       route: {
         statusCode: {
-          404: 'Page not found.'
+          404: 'Not found',
+          500: 'Internal server error'
         }
       }
     }
