@@ -11,7 +11,7 @@ const sendFile = async (filePath , res) => {
   const file = await controller.getFileStream(filePath)
   const contentType = constant.contentType[file.type]
 
-  if (!!contentType) res.writeHead(200, {
+  if (!!contentType) res.writeHead(statusCode['OK'], {
     'Content-Type': contentType,
   })
   
@@ -19,7 +19,7 @@ const sendFile = async (filePath , res) => {
 }
 
 const redirect = (res) => {
-  res.writeHead(302, {
+  res.writeHead(statusCode['FOUND'], {
       Location: config.location.home,
   })
   return res.end()
