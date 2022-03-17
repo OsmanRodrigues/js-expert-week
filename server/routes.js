@@ -24,7 +24,7 @@ const redirect = (res) => {
 }
 
 const routes = async (req, res) => {
-  const { page, location, method, constant } = config
+  const { page, location, method, constant, statusCode } = config
   
   switch (req.method) {
 
@@ -57,8 +57,10 @@ const routes = async (req, res) => {
           return stream.pipe(res)
         
         default:
-          const notFoundPageMsg = 'Page not found.'
-          res.writeHead(404, notFoundPageMsg)
+          const code = statusCode['NOT_FOUND']
+          const notFoundPageMsg = constant.fallback.route.statusCode[code]
+
+          res.writeHead(code)
           return res.end(notFoundPageMsg)
         
       }

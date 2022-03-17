@@ -4,7 +4,7 @@ import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller'
 import { handler } from '../../../server/routes'
 
-const { method, location, page, constant } = config
+const { method, location, page, constant, statusCode } = config
 
 describe('#Routes', () => {
   beforeEach(() => {
@@ -107,13 +107,16 @@ describe('#Routes', () => {
 
   test(`${method.get} /unknow ~ Should respond with 404`,  async () => {
     const params = defaultHandleParams()
+    const expectedStatusCode = statusCode['NOT_FOUND']
     params.request.method = method.get
     params.request.url = `/unknow`
     
     await handler(...params.values())
 
-    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Page not found.')
-    expect(params.response.end).toHaveBeenCalled()
+    expect(params.response.writeHead).toHaveBeenCalledWith(expectedStatusCode)
+    expect(params.response.end).toHaveBeenCalledWith(
+      constant.fallback.route.statusCode[expectedStatusCode]
+    )
   })
 
   test(`${method.post} /unknow ~ Should respond with 404 Method not found`,  async () => {

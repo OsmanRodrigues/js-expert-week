@@ -14,7 +14,7 @@ describe('#API e2e', () => {
   })
 
   describe('Client workflow', () => {
-    test('It should not receive a data stream if the proccess is not playing', async () => {  
+    test('It should not receive data stream if the proccess is not playing', async () => {  
       const server = await getTestServer(apiServer)
       const onChunk = jest.fn()
       pipeAndReadStreamData(
@@ -29,7 +29,7 @@ describe('#API e2e', () => {
 
     })
     
-    test('It should receive a data stream if the proccess has playing', async () => {
+    test('It should receive data stream if the proccess has playing', async () => {
       const server = await getTestServer(apiServer)
       const onChunk = jest.fn()
       const {
@@ -55,7 +55,7 @@ describe('#API e2e', () => {
       server.kill()
     })
 
-    test('GET /home ~ It should receive a text/html file and status code 200', async () => {
+    test('GET /home ~ It should receive text/html file and status code 200', async () => {
       const server = await getTestServer(apiServer)
       const expectedPageFile = fs.readFileSync(getPath(`/public${page.home}`)).toString()
       const result = await server.testServer.get(location.home)
@@ -67,7 +67,7 @@ describe('#API e2e', () => {
       server.kill()
     })
 
-    test('GET /controller ~ It should receive a text/html file and status code 200', async () => {
+    test('GET /controller ~ It should receive text/html file and status code 200', async () => {
       const server = await getTestServer(apiServer)
       const expectedPageFile = fs.readFileSync(getPath(`/public${page.controller}`)).toString()
       const result = await server.testServer.get(location.controller)
@@ -79,7 +79,7 @@ describe('#API e2e', () => {
       server.kill()
     })
 
-    test(`GET /home/js/animation.js ~ It should receive a application/javascript file 
+    test(`GET /home/js/animation.js ~ It should receive application/javascript file 
     and status code 200`, async () => {
       const server = await getTestServer(apiServer)
       const endpoint = '/home/js/animation.js'
@@ -93,7 +93,7 @@ describe('#API e2e', () => {
       server.kill()
     })
 
-    test(`GET /controller/css/style.css ~ It should receive a text/css file 
+    test(`GET /controller/css/style.css ~ It should receive text/css file 
     and status code 200`, async () => {
       const server = await getTestServer(apiServer)
       const endpoint = '/controller/css/style.css'
@@ -105,6 +105,25 @@ describe('#API e2e', () => {
       expect(result.headers['content-type']).toStrictEqual(constant.contentType['.css'])
 
       server.kill()
+    })
+
+    describe('Exceptions', () => {
+      test(`When access a inexistent endpoint, it should receive not found error and 
+      status code 404`, async () => {
+        const server = await getTestServer(apiServer)
+        const endpoint = '/foo'
+        const result = await server.testServer.get(endpoint)
+        const expectedStatusCode = statusCode['NOT_FOUND']
+        const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]
+        console.log(result.text)
+        
+        expect(result.statusCode).toStrictEqual(expectedStatusCode)
+        expect(result.text).toStrictEqual(expectedFallback)
+
+        server.kill()
+      })
+      test.todo('It should receive method not allowed error and status code 405')
+      test.todo('It should receive internal server error and status code 500')
     })
   })
 })
