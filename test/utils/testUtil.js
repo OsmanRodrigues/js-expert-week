@@ -78,12 +78,12 @@ export const getTestServer = async(apiServer) => {
   })
 }
 
-export const commandSender = (testServer) => {
+export const mutationSender = (testServer) => {
   return {
-    async send(command, result) {
+    async send(data, result) {
       const response = await testServer
         .post(config.location.controller)
-        .send(command)
+        .send(data)
       
       expect(response.text).toStrictEqual(JSON.stringify(result))
     }

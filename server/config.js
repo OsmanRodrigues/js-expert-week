@@ -35,6 +35,9 @@ export const config = {
     get: 'GET',
     post: 'POST'
   },
+  statusCode: {
+    'OK': 200
+  },
   constant: {
     contentType: {
       '.html': 'text/html',
