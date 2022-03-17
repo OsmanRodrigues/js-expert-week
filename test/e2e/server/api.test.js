@@ -79,7 +79,20 @@ describe('#API e2e', () => {
       server.kill()
     })
 
-    test.todo('GET /home/js/animation.js ~ It should receive a application/javascript file and status code 200')
+    test(`GET /home/js/animation.js ~ It should receive a application/javascript file 
+    and status code 200`, async () => {
+      const server = await getTestServer(apiServer)
+      const endpoint = '/home/js/animation.js'
+      const expectedPageFile = fs.readFileSync(getPath(`/public${endpoint}`)).toString()
+      const result = await server.testServer.get(endpoint)
+      
+      expect(result.text).toStrictEqual(expectedPageFile)
+      expect(result.statusCode).toStrictEqual(statusCode['OK'])
+      expect(result.headers['content-type']).toStrictEqual(constant.contentType['.js'])
+
+      server.kill()
+    })
+    
     test.todo('GET /controller/css/style.css ~ It should receive a text/css file and status code 200')
   })
 })
