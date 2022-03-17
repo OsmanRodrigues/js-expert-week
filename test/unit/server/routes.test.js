@@ -121,13 +121,15 @@ describe('#Routes', () => {
 
   test(`${method.post} /unknow ~ Should respond with 404 Method not found`,  async () => {
     const params = defaultHandleParams()
+    const expectedStatusCode = statusCode['METHOD_NOT_ALLOWED']
+    const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]
     params.request.method = method.post
     params.request.url = `/unknow`
     
     await handler(...params.values())
 
-    expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Method not found.')
-    expect(params.response.end).toHaveBeenCalled()
+    expect(params.response.writeHead).toHaveBeenCalledWith(expectedStatusCode)
+    expect(params.response.end).toHaveBeenCalledWith(expectedFallback)
   })
 
   describe('Exceptions', () => {
@@ -142,12 +144,14 @@ describe('#Routes', () => {
         
       await handler(...params.values())
 
-      expect(params.response.writeHead).toHaveBeenCalledWith(404, 'Asset not found.')
+      expect(params.response.writeHead).toHaveBeenCalledWith(statusCode['NOT_FOUND'])
       expect(params.response.end).toHaveBeenCalled()
     })
 
     test('Given an error it should respond with 500', async () => {
       const params = defaultHandleParams()
+      const expectedStatusCode = statusCode['INTERNAL_SERVER_ERROR']
+      const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]
       params.request.method = method.get
       params.request.url = `/home/assets/photo.png`
       jest.spyOn(
@@ -157,8 +161,8 @@ describe('#Routes', () => {
         
       await handler(...params.values())
 
-      expect(params.response.writeHead).toHaveBeenCalledWith(500, 'Internal error.')
-      expect(params.response.end).toHaveBeenCalled()
+      expect(params.response.writeHead).toHaveBeenCalledWith(expectedStatusCode)
+      expect(params.response.end).toHaveBeenCalledWith(expectedFallback)
     })
   })
 })
