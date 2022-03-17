@@ -1,8 +1,8 @@
 import { config, getPath } from '../../../server/config'
-import { testUtil } from '../utils/testUtil'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service'
 import fs, { promises as fsPromises } from 'fs'
+import { generateReadableStream } from '../../utils/testUtil'
 
 const { page, constant } = config
 
@@ -14,7 +14,7 @@ describe('#Service', () => {
 
   test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
     const expectedFilePath = getPath(page.home)
-    const mockFileStream = testUtil.generateReadableStream(['data'])
+    const mockFileStream = generateReadableStream(['data'])
     
     jest.spyOn(
       fs,
@@ -53,7 +53,7 @@ describe('#Service', () => {
     const expectedFileName = page.home
     const expectedFilePath = getPath(`public/${page.home}`)
     const expectedFileExt = constant.fileExt.html;
-    const mockFileStream = testUtil.generateReadableStream(['data'])
+    const mockFileStream = generateReadableStream(['data'])
 
     jest.spyOn(
       Service.prototype,

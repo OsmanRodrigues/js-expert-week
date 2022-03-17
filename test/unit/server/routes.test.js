@@ -1,5 +1,5 @@
 import { config } from '../../../server/config'
-import { testUtil } from '../../utils/testUtil'
+import { defaultHandleParams, generateReadableStream } from '../../utils/testUtil'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller'
 import { handler } from '../../../server/routes'
@@ -13,7 +13,7 @@ describe('#Routes', () => {
   })
 
   test(`${method.get} ${location.main} ~ Should redirect to home page`, async () => {
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.main
 
@@ -29,10 +29,10 @@ describe('#Routes', () => {
   })
 
   test(`${method.get} ${location.home} ~ Should respond with ${page.home} file stream`, async () => {
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.home
-    const mockFileStream = testUtil.generateReadableStream(['data'])
+    const mockFileStream = generateReadableStream(['data'])
     
     jest.spyOn(
       Controller.prototype,
@@ -52,10 +52,10 @@ describe('#Routes', () => {
   })
 
   test(`${method.get} ${location.controller} ~ Should respond with ${page.controller} file stream`, async () => {
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.controller
-    const mockFileStream = testUtil.generateReadableStream(['data'])
+    const mockFileStream = generateReadableStream(['data'])
 
     jest.spyOn(
       Controller.prototype,
@@ -76,10 +76,10 @@ describe('#Routes', () => {
    
   test(`${method.get} /file.ext ~ Should respond with file stream`,  async () => {
     const expectedType = '.css'
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = `/home/css/styles${expectedType}`
-    const mockFileStream = testUtil.generateReadableStream(['data'])
+    const mockFileStream = generateReadableStream(['data'])
     
     jest.spyOn(
       Controller.prototype,
@@ -106,7 +106,7 @@ describe('#Routes', () => {
   })
 
   test(`${method.get} /unknow ~ Should respond with 404`,  async () => {
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = `/unknow`
     
@@ -117,7 +117,7 @@ describe('#Routes', () => {
   })
 
   test(`${method.post} /unknow ~ Should respond with 404 Method not found`,  async () => {
-    const params = testUtil.defaultHandleParams()
+    const params = defaultHandleParams()
     params.request.method = method.post
     params.request.url = `/unknow`
     
@@ -129,7 +129,7 @@ describe('#Routes', () => {
 
   describe('Exceptions', () => {
     test('Given inexistent file it should respond with 404', async () => {
-      const params = testUtil.defaultHandleParams()
+      const params = defaultHandleParams()
       params.request.method = method.get
       params.request.url = `/home/assets/photo.png`
       jest.spyOn(
@@ -144,7 +144,7 @@ describe('#Routes', () => {
     })
 
     test('Given an error it should respond with 500', async () => {
-      const params = testUtil.defaultHandleParams()
+      const params = defaultHandleParams()
       params.request.method = method.get
       params.request.url = `/home/assets/photo.png`
       jest.spyOn(

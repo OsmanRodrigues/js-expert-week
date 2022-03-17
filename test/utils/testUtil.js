@@ -1,7 +1,10 @@
-import { Readable, Writable } from 'stream'
+import { Readable, Writable, Transform } from 'stream'
 import { jest } from '@jest/globals'
+import portfinder from 'portfinder'
+import supertest from 'supertest'
+import { config } from '../../server/config'
 
-const generateReadableStream = (data) => new Readable({
+export const generateReadableStream = (data) => new Readable({
   read() {
     for (const item of data) {
       this.push(item)
@@ -11,7 +14,7 @@ const generateReadableStream = (data) => new Readable({
   }
 })
 
-const generateWritableStream = (onData) => new Writable({
+export const generateWritableStream = (onData) => new Writable({
   write(chunk, enc, cb) {
     onData(chunk)
 
@@ -19,7 +22,7 @@ const generateWritableStream = (onData) => new Writable({
   }
 })
 
-const defaultHandleParams = () => {
+export const defaultHandleParams = () => {
   const requestStream = generateReadableStream(['req body'])
   const responseStream = generateWritableStream(() => { })
   const data = {
@@ -42,8 +45,47 @@ const defaultHandleParams = () => {
   }
 }
 
-export const testUtil = {
-  defaultHandleParams,
-  generateReadableStream,
-  generateWritableStream
+export const pipeAndReadStreamData = (stream, onChunk) => {
+  const transform = new Transform({
+    transform(chunk, enc, cb) {
+      onChunk(chunk)
+      cb(null,chunk)
+    }
+  })   
+
+  return stream.pipe(transform)
+}
+
+export const getTestServer = async(apiServer) => {
+  const getSuperTest = port => supertest(`http://localhost:${port}`)
+  const port = await portfinder.getPortPromise()
+
+  return new Promise((res, rej) => {
+    const server = apiServer
+      .listen(port)
+      .once('listening', () => {
+        const testServer = getSuperTest(port)
+        const response = {
+          testServer,
+          kill() {
+            server.close()
+          }
+        }
+
+        return res(response)
+      })
+      .once('error', rej)
+  })
+}
+
+export const commandSender = (testServer) => {
+  return {
+    async send(command, result) {
+      const response = await testServer
+        .post(config.location.controller)
+        .send(command)
+      
+      expect(response.text).toStrictEqual(JSON.stringify(result))
+    }
+  }
 }

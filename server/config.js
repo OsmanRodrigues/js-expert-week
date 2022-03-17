@@ -64,6 +64,26 @@ export const config = {
     util: {
       test: {
         retentionDataPeriod: 200,
+        e2e: {
+          command: {
+            req: {
+              start: {
+                command: 'start'
+              },
+              stop: {
+                command: 'stop'
+              }
+            },
+            res: {
+              started: {
+                result: 'started'
+              },
+              stopped: {
+                result: 'stopped'
+              }
+            }
+          }
+        }
       }
     }
   }

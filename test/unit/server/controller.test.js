@@ -1,8 +1,8 @@
-import { config, getPath } from '../../../server/config'
-import { testUtil } from '../utils/testUtil'
+import { config } from '../../../server/config'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller'
 import { Service } from '../../../server/service'
+import { generateReadableStream } from '../../utils/testUtil'
 
 describe('#Controller', () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('#Controller', () => {
   resolved with an object with stream and type`, async() => {
     const expectedFileName = config.page.controller
     const expectedFileExt = config.constant.fileExt.html
-    const mockedFileStream = testUtil.generateReadableStream(['data'])
+    const mockedFileStream = generateReadableStream(['data'])
     const mockedResolvedValue = {
       type: expectedFileExt,
       stream: mockedFileStream
