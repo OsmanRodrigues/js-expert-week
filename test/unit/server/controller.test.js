@@ -1,8 +1,8 @@
-import { config, getPath } from '../../../server/config';
-import { testUtil } from '../utils/testUtil';
-import { jest, expect, describe, test, beforeEach } from '@jest/globals';
-import { Controller } from '../../../server/controller';
-import { Service } from '../../../server/service';
+import { config, getPath } from '../../../server/config'
+import { testUtil } from '../utils/testUtil'
+import { jest, expect, describe, test, beforeEach } from '@jest/globals'
+import { Controller } from '../../../server/controller'
+import { Service } from '../../../server/service'
 
 describe('#Controller', () => {
   beforeEach(() => {

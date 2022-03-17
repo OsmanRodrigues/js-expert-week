@@ -1,9 +1,9 @@
-import { jest, expect, describe, test, beforeEach } from '@jest/globals';
+import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import portfinder from 'portfinder'
 import supertest from 'supertest'
 import { Transform } from 'stream'
 import { setTimeout } from 'timers/promises'
-import { config } from '../../../server/config.js';
+import { config } from '../../../server/config.js'
 import { server as apiServer, server } from '../../../server/server.js'
 
 const { method, location, page, constant } = config
@@ -49,7 +49,7 @@ describe('#API e2e', () => {
     return {
       async send(command, result) {
         const response = await testServer
-          .post('/controller')
+          .post(location.controller)
           .send(command)
         
         expect(response.text).toStrictEqual(JSON.stringify(result))

@@ -1,8 +1,8 @@
-import { config, getPath } from '../../../server/config';
-import { testUtil } from '../utils/testUtil';
-import { jest, expect, describe, test, beforeEach } from '@jest/globals';
-import { Service } from '../../../server/service';
-import fs, { promises as fsPromises } from 'fs';
+import { config, getPath } from '../../../server/config'
+import { testUtil } from '../utils/testUtil'
+import { jest, expect, describe, test, beforeEach } from '@jest/globals'
+import { Service } from '../../../server/service'
+import fs, { promises as fsPromises } from 'fs'
 
 const { page, constant } = config
 

@@ -1,5 +1,5 @@
 import { config } from '../../../server/config'
-import { testUtil } from '../utils/testUtil'
+import { testUtil } from '../../utils/testUtil'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller'
 import { handler } from '../../../server/routes'
