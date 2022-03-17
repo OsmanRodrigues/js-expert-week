@@ -108,6 +108,17 @@ describe('#API e2e', () => {
     })
 
     describe('Exceptions', () => {
+      test(`When access a main "/" route, should receive location "/home" and status 304`, async () => {
+        const server = await getTestServer(apiServer)
+        const mainRoute = '/'
+        const result = await server.testServer.get(mainRoute)
+
+        expect(result.header.location).toStrictEqual(location.home)
+        expect(result.statusCode).toStrictEqual(statusCode['FOUND'])
+
+        server.kill()
+      })
+
       test(`When access a inexistent route, should receive not found error and status code 404`, async () => {
         const server = await getTestServer(apiServer)
         const inexistentRoute = '/foo'
