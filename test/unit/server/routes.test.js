@@ -12,7 +12,7 @@ describe('#Routes', () => {
     jest.clearAllMocks()
   })
 
-  test(`${method.get} ${location.main} ~ Should redirect to home page`, async () => {
+  test(`GET / ~ Should redirect to home page`, async () => {
     const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.main
@@ -20,7 +20,7 @@ describe('#Routes', () => {
     await handler(...params.values())
 
     expect(params.response.writeHead).toBeCalledWith(
-      302,
+      statusCode['FOUND'],
       {
         'Location': location.home
       }
@@ -28,7 +28,7 @@ describe('#Routes', () => {
     expect(params.response.end).toBeCalled()
   })
 
-  test(`${method.get} ${location.home} ~ Should respond with ${page.home} file stream`, async () => {
+  test(`GET /home ~ Should respond with /home/index.html file stream`, async () => {
     const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.home
@@ -51,7 +51,7 @@ describe('#Routes', () => {
     expect(spyFileStream).toHaveBeenCalledWith(params.response)
   })
 
-  test(`${method.get} ${location.controller} ~ Should respond with ${page.controller} file stream`, async () => {
+  test(`GET /controller ~ Should respond with /controller/index.html file stream`, async () => {
     const params = defaultHandleParams()
     params.request.method = method.get
     params.request.url = location.controller
@@ -74,7 +74,7 @@ describe('#Routes', () => {
     expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
   })
    
-  test(`${method.get} /file.ext ~ Should respond with file stream`,  async () => {
+  test(`GET /file.ext ~ Should respond with file stream`,  async () => {
     const expectedType = '.css'
     const params = defaultHandleParams()
     params.request.method = method.get
@@ -105,7 +105,7 @@ describe('#Routes', () => {
     )
   })
 
-  test(`${method.get} /unknow ~ Should respond with 404`,  async () => {
+  test(`GET /unknow ~ Should respond with 404`,  async () => {
     const params = defaultHandleParams()
     const expectedStatusCode = statusCode['NOT_FOUND']
     params.request.method = method.get
@@ -119,7 +119,7 @@ describe('#Routes', () => {
     )
   })
 
-  test(`${method.post} /unknow ~ Should respond with 404 Method not found`,  async () => {
+  test(`GET /unknow ~ Should respond with 404 Method not found`,  async () => {
     const params = defaultHandleParams()
     const expectedStatusCode = statusCode['METHOD_NOT_ALLOWED']
     const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]

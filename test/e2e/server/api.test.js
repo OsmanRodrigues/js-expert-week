@@ -3,7 +3,7 @@ import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { setTimeout } from 'timers/promises'
 import { config, getPath } from '../../../server/config.js'
 import { server as apiServer } from '../../../server/server.js'
-import { mutationSender, getTestServer, pipeAndReadStreamData, generateReadableStream } from '../../utils/testUtil.js'
+import { mutationSender, getTestServer, pipeAndReadStreamData } from '../../utils/testUtil.js'
 
 const { location, constant, page, statusCode } = config
 
@@ -110,7 +110,7 @@ describe('#API e2e', () => {
     describe('Exceptions', () => {
       test(`When access a main "/" route, should receive location "/home" and status 304`, async () => {
         const server = await getTestServer(apiServer)
-        const mainRoute = '/'
+        const mainRoute = location.main
         const result = await server.testServer.get(mainRoute)
 
         expect(result.header.location).toStrictEqual(location.home)
