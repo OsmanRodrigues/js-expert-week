@@ -12,8 +12,13 @@ export class Controller {
     return controller
   }
 
+  async callReceivedCommand(command) {
+    console.log('controller', command)
+  }
+
   onLoad() {
+    this.view.configureOnBtnClick(this.callReceivedCommand.bind(this))
     this.view.onLoad()
   }
-  
+
 }
