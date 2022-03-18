@@ -3,7 +3,7 @@ import { View } from '../../../public/controller/js/view.js'
 import { buildBtnElement, generateTestDOM } from '../../utils/testUtil'
 import { config } from '../../../public/controller/js/config.js'
 
-const { constant } = config
+const { constant: { className, state } } = config
 
 describe('#View', () => {
   generateTestDOM()
@@ -19,9 +19,9 @@ describe('#View', () => {
     ).mockReturnValue([mockBtn])
   })
 
-  test(`toggleCommandVisibility ~ if shouldToggle=true it should add unassigned class and reset onclick`, () => {
+  test(`toggleCommandVisibility ~ if visibility='visible' it should add unassigned class and reset onclick`, () => {
     const mockBtn = buildBtnElement()
-    const expectedClassName = constant.className.button.unassigned
+    const expectedClassName = className.button.unassigned
     const expectedResetFnName = 'onClickReset'
 
     jest.spyOn(
@@ -30,16 +30,16 @@ describe('#View', () => {
     ).mockReturnValue([mockBtn])
 
     const view = new View()
-    view.toggleCommandBtnVisibility()
-
+    view.toggleCommandBtnVisibility({ visibility: state.visibility.visible })
+    
     expect(mockBtn.classList.add).toHaveBeenCalledWith(expectedClassName)
     expect(mockBtn.onclick.name).toStrictEqual(expectedResetFnName)
     expect(()=> mockBtn.onclick()).not.toThrow()
   })
 
-  test(`toggleCommandVisibility ~ if shouldToggle=false it should remove unassigned class and reset onclick`, () => {
+  test(`toggleCommandVisibility ~ if visibility=notVisible it should remove unassigned class and reset onclick`, () => {
     const mockBtn = buildBtnElement()
-    const expectedClassName = constant.className.button.unassigned
+    const expectedClassName = className.button.unassigned
     const expectedResetFnName = 'onClickReset'
 
     jest.spyOn(
@@ -48,7 +48,7 @@ describe('#View', () => {
     ).mockReturnValue([mockBtn])
 
     const view = new View()
-    view.toggleCommandBtnVisibility(false)
+    view.toggleCommandBtnVisibility({ visibility: state.visibility.notVisible })
 
     expect(mockBtn.classList.add).not.toHaveBeenCalled()
     expect(mockBtn.classList.remove).toHaveBeenCalledWith(expectedClassName);

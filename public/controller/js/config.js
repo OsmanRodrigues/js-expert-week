@@ -21,7 +21,14 @@ export const config = {
     },
     className: {
       button: {
-        unassigned: 'unassigned'
+        unassigned: 'unassigned',
+        hidden: 'hidden'
+      }
+    },
+    state: {
+      visibility: {
+        visible: 'visible',
+        notVisible: 'notVisible'
       }
     }
   }
