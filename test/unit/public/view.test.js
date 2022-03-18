@@ -11,6 +11,12 @@ describe('#View', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     jest.clearAllMocks()
+    
+    const mockBtn = buildBtnElement()
+    jest.spyOn(
+      document,
+      'getElementById'
+    ).mockReturnValue([mockBtn])
   })
 
   test(`toggleCommandVisibility ~ if shouldToggle=true it should add unassigned class and reset onclick`, () => {
