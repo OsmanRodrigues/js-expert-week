@@ -119,11 +119,12 @@ describe('#Routes', () => {
     )
   })
 
-  test(`GET /unknow ~ Should respond with 404 Method not found`,  async () => {
+  test(`DELETE /unknow ~ Should respond with 405 method not allowed`,  async () => {
     const params = defaultHandleParams()
+    const requestedMethod = 'DELETE'
     const expectedStatusCode = statusCode['METHOD_NOT_ALLOWED']
     const expectedFallback = constant.fallback.route.statusCode[expectedStatusCode]
-    params.request.method = method.post
+    params.request.method = requestedMethod
     params.request.url = `/unknow`
     
     await handler(...params.values())

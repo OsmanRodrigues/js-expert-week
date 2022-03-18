@@ -97,6 +97,7 @@ export const config = {
       route: {
         statusCode: {
           404: 'Not found',
+          405: 'Not allowed',
           500: 'Internal server error'
         }
       }
