@@ -6,6 +6,13 @@ export class Controller {
   }
 
   static initialize(View, Service) {
-    return new Controller(View, Service)
+    const controller = new Controller(View, Service)
+    controller.onLoad()
+
+    return controller
+  }
+
+  onLoad() {
+    this.view.onLoad()
   }
 }
