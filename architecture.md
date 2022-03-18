@@ -16,3 +16,16 @@
   
   #### config 
   Static assets
+
+### Client
+  #### service 
+  Business layer
+  
+  #### controller 
+  Presentation and business layers middleware
+  
+  #### view 
+  Presentation layer
+  
+  #### index 
+  Application entrypoint
