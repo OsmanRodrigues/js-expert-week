@@ -140,4 +140,71 @@ export class Service {
     }
   }
 
+  async getFxFileByName(fxName) {
+    const fxFilesPaths = await fsPromises.readdir(config.dir.fx)
+    const choosenFxFilePath = fxFilesPaths.find(filePath => filePath.toLowerCase().includes(fxName))
+
+    if (!choosenFxFilePath) return Promise.reject(`Fx file "${fxName}" not found.`)
+    
+    return `${config.dir.fx}/${choosenFxFilePath}`
+  }
+
+  appendFxStream(fxFile) {
+    const currentThrottleTransform = new Throttle(this.currentBitRate)
+    streamPromises.pipeline(
+      currentThrottleTransform,
+      this.broadCast()
+    )
+    const unpipe = () => {
+      const transformableStream = this.mergeAudioStreams(fxFile, this.currentReadable)
+      this.throttleTransform = currentThrottleTransform
+      this.currentReadable = transformableStream
+      this.currentReadable.removeListener('unpipe', unpipe)
+      
+      streamPromises.pipeline(
+        transformableStream,
+        currentThrottleTransform
+      )
+    }
+
+    this.throttleTransform.on('unpipe', unpipe)
+    this.throttleTransform.pause()
+    this.currentReadable.unpipe(this.throttleTransform)
+  }
+
+  mergeAudioStreams(fxFile, currentAudioReadable) {
+    const transformStream = PassThrough()
+    const args = [
+      '-t', constant.audio.mediaType,
+      '-v', constant.audio.songVolume,
+      //1. "-m" = merge | 2. "-" = receive like stream 
+      '-m', '-',
+      '-t', constant.audio.mediaType,
+      '-v', constant.audio.fxVolume,
+      fxFile,
+      '-t', constant.audio.mediaType,
+      '-'
+    ]
+
+    const {
+      stdin,
+      stdout
+    } = this._executeSoxCommand(args)
+
+    // Plugin the current audio stream in cli input (stdin)
+    streamPromises.pipeline(
+      currentAudioReadable,
+      stdin
+    )
+    //.catch(err => `Error on sending stream to sox: ${err}`)
+
+    streamPromises.pipeline(
+      stdout,
+      transformStream
+    )
+    //.catch(err => `Error on receiving stream from sox: ${err}`)
+    
+    return transformStream
+  }
+
 }

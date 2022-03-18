@@ -11,7 +11,7 @@ export class Controller {
     return this.service.getFileStream(fileName)
   }
 
-  handleStreamingCommand({ command }) {
+  async handleStreamingCommand({ command }) {
     logger.info(`Command received: ${command}`)
     const safeCommand = command.toLowerCase()
 
@@ -25,7 +25,11 @@ export class Controller {
         return { result: 'stopped' }
       
       default:
-        return { result: 'command not found' }
+        const fxFilePath = await this.service.getFxFileByName(safeCommand)
+        logger.info(`Choosen fx: ${fxFilePath}`)
+        this.service.appendFxStream(fxFilePath)
+
+        return { result: `${safeCommand} executed successfully` }
     }
 
   }

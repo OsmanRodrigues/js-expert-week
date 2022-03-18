@@ -55,7 +55,6 @@ export class View {
   }
 
   async handleBtnCommandClick(btn) {
-    console.log(btn.srcElement)
     this.applyCommandBtnOnClickEffect(btn.srcElement)
     
     return await this.onBtnClick(btn.srcElement.innerText)
@@ -90,5 +89,5 @@ export class View {
 
     })
   }
-  
+
 }
