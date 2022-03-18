@@ -22,7 +22,8 @@ export const config = {
     className: {
       button: {
         unassigned: 'unassigned',
-        hidden: 'hidden'
+        hidden: 'hidden',
+        active: 'active'
       }
     },
     state: {
@@ -30,6 +31,7 @@ export const config = {
         visible: 'visible',
         notVisible: 'notVisible'
       }
-    }
+    },
+    retentionPeriod: 500,
   }
 }
