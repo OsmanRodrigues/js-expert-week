@@ -1,31 +1,32 @@
 import { config } from "./config.js"
 
-const { constant: { name, className, id, state }, action } = config
+const { constant, action } = config
 
 export class View {
 
   constructor() {
-    this.btnStart = document.getElementById(id.button.start)
-    this.btnStop = document.getElementById(id.button.stop)
+    this.btnStart = document.getElementById(constant.id.button.start)
+    this.btnStop = document.getElementById(constant.id.button.stop)
     async function onBtnClick() { }
     this.onBtnClick = onBtnClick
   }
 
   onLoad() {
     this.toggleCommandBtnVisibility()
-    this.btnStart.onclick = this.handleBtnStarClicked.bind(this)
+    this.btnStart.onclick = this.handleBtnStartStopClicked.bind(this)
+    this.btnStop.onclick = this.handleBtnStartStopClicked.bind(this)
   }
 
   toggleCommandBtnVisibility({ visibility } = { visibility: null }) {
     Array
-      .from(document.querySelectorAll(`[name=${name.button.command}]`))
+      .from(document.querySelectorAll(`[name=${constant.name.button.command}]`))
       .forEach(btn => {
         const isNotVisible = !!visibility ?
-          visibility === state.visibility.notVisible :
-          !!btn?.classList?.contains?.(className.button.unassigned)
+          visibility === constant.state.visibility.notVisible :
+          !!btn?.classList?.contains?.(constant.className.button.unassigned)
         
         const currentAction = isNotVisible ? action.remove : action.add
-        btn.classList[currentAction](className.button.unassigned)
+        btn.classList[currentAction](constant.className.button.unassigned)
         function onClickReset() {}
         btn.onclick = onClickReset
       })
@@ -35,26 +36,35 @@ export class View {
     this.onBtnClick = fn
   }
 
-  async handleBtnStarClicked({
+  async handleBtnStartStopClicked({
     srcElement: {
+      id,
       innerText
     }
   }) {
-    const btnText = innerText
-    await this.onBtnClick(btnText)
+    const hasStartBtnClicked = id === constant.id.button.start 
+    
+    if (hasStartBtnClicked) {
+      await this.onBtnClick(innerText)
+    }
+    
     this.toggleStartStop()
     this.toggleCommandBtnVisibility()
+
+    if (!hasStartBtnClicked) {
+      return await this.onBtnClick(innerText)
+    }
   }
 
   toggleStartStop() {
-    const isStopped = this.btnStop.classList.contains(className.button.hidden)
+    const isStopped = this.btnStop.classList.contains(constant.className.button.hidden)
 
     if (isStopped) {
-      this.btnStart.classList.add(className.button.hidden)
-      this.btnStop.classList.remove(className.button.hidden)
+      this.btnStart.classList.add(constant.className.button.hidden)
+      this.btnStop.classList.remove(constant.className.button.hidden)
     } else {
-      this.btnStart.classList.remove(className.button.hidden)
-      this.btnStop.classList.add(className.button.hidden)
+      this.btnStart.classList.remove(constant.className.button.hidden)
+      this.btnStop.classList.add(constant.className.button.hidden)
     }
   }
 }
