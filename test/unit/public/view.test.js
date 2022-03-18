@@ -30,6 +30,24 @@ describe('#View', () => {
     expect(mockBtn.onclick.name).toStrictEqual(expectedResetFnName)
     expect(()=> mockBtn.onclick()).not.toThrow()
   })
-  test.todo(`toggleCommandVisibility ~ if shouldToggle=false it should remove unassigned class and reset onclick`)
+  
+  test(`toggleCommandVisibility ~ if shouldToggle=false it should remove unassigned class and reset onclick`, () => {
+    const mockBtn = buildBtnElement()
+    const expectedClassName = constant.className.button.unassigned
+    const expectedResetFnName = 'onClickReset'
+
+    jest.spyOn(
+      document,
+      'querySelectorAll'
+    ).mockReturnValue([mockBtn])
+
+    const view = new View()
+    view.toggleCommandBtnVisibility(false)
+
+    expect(mockBtn.classList.add).not.toHaveBeenCalled()
+    expect(mockBtn.classList.remove).toHaveBeenCalledWith(expectedClassName);
+    expect(mockBtn.onclick.name).toStrictEqual(expectedResetFnName)
+    expect(()=> mockBtn.onclick()).not.toThrow()
+  })
   test.todo(`onLoad ~ `)
 })
