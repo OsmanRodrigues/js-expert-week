@@ -117,7 +117,7 @@ export class Service {
     }
   }
 
-  createFileStream(filePath ) {
+  createFileStream(filePath) {
     return fs.createReadStream(filePath)
   } 
   
