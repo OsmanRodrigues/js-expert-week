@@ -4,6 +4,12 @@ export const config = {
     remove: 'remove'
   },
   constant: {
+    id: {
+      button: {
+        start: 'start',
+        stop: 'stop'
+      }
+    },
     name: {
       button: {
         command: 'command'
