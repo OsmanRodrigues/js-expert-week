@@ -77,7 +77,11 @@ const routes = async (req, res) => {
           return res.end(parsedResult)
       
         default:
-          break;
+          const code = statusCode['NOT_FOUND']
+          const notFoundPageMsg = constant.fallback.route.statusCode[code]
+
+          res.writeHead(code)
+          return res.end(notFoundPageMsg)
       }
 
     default:

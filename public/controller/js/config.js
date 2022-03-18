@@ -1,4 +1,8 @@
 export const config = {
+  method: {
+    get: 'GET',
+    post: 'POST'
+  },
   action: {
     add: 'add',
     remove: 'remove'

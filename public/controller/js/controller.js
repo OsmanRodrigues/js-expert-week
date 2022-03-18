@@ -2,7 +2,7 @@ export class Controller {
   
   constructor(View, Service) {
     this.view = new View()
-    this.Service = new Service()
+    this.service = new Service({ url: `${window.location.origin}/controller` })
   }
 
   static initialize(View, Service) {
@@ -13,7 +13,9 @@ export class Controller {
   }
 
   async callReceivedCommand(command) {
-    console.log('controller', command)
+    return this.service
+      .request()
+      .post({ command })
   }
 
   onLoad() {
