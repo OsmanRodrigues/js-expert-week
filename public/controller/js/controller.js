@@ -15,4 +15,5 @@ export class Controller {
   onLoad() {
     this.view.onLoad()
   }
+  
 }

@@ -3,6 +3,7 @@ import { jest } from '@jest/globals'
 import portfinder from 'portfinder'
 import supertest from 'supertest'
 import { config } from '../../server/config'
+import { JSDOM } from 'jsdom'
 
 export const generateReadableStream = (data) => new Readable({
   read() {
@@ -89,3 +90,34 @@ export const mutationSender = (testServer) => {
     }
   }
 }
+
+export const generateTestDOM = () => {
+  const dom = new JSDOM()
+  global.window = dom.window
+  global.document = dom.window.document
+
+  return dom
+}
+
+const elementFactoryDefaultParams = {
+  text: '',
+  classList: {
+    add: jest.fn(),
+    remove: jest.fn()
+  }
+}
+
+export const elementFactory = ({ text, classList, ...other } = {
+  ...elementFactoryDefaultParams,
+  ...other
+}) => ({
+  classList,
+  innerText: text,
+  ...other
+})
+
+export const buildBtnElement = ({ text, classList } = elementFactoryDefaultParams) => elementFactory({
+  text,
+  classList,
+  onclick: jest.fn
+})
