@@ -1,8 +1,8 @@
-import { config } from '../../../server/config'
-import { defaultHandleParams, generateReadableStream } from '../../utils/testUtil'
+import { config } from '../../../server/config.js'
+import { defaultHandleParams, generateReadableStream } from '../../utils/testUtil.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
-import { Controller } from '../../../server/controller'
-import { handler } from '../../../server/routes'
+import { Controller } from '../../../server/controller.js'
+import { handler } from '../../../server/routes.js'
 
 const { method, location, page, constant, statusCode } = config
 

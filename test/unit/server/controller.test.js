@@ -1,8 +1,8 @@
-import { config } from '../../../server/config'
+import { config } from '../../../server/config.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
-import { Controller } from '../../../server/controller'
-import { Service } from '../../../server/service'
-import { generateReadableStream } from '../../utils/testUtil'
+import { Controller } from '../../../server/controller.js'
+import { Service } from '../../../server/service.js'
+import { generateReadableStream } from '../../utils/testUtil.js'
 
 describe('#Controller', () => {
   beforeEach(() => {

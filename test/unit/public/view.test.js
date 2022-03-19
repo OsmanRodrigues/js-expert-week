@@ -1,6 +1,6 @@
 import { jest, expect, describe, test } from '@jest/globals'
 import { View } from '../../../public/controller/js/view.js'
-import { buildBtnElement, generateTestDOM } from '../../utils/testUtil'
+import { buildBtnElement, generateTestDOM } from '../../utils/testUtil.js'
 import { config } from '../../../public/controller/js/config.js'
 
 const { constant: { className, state } } = config

@@ -1,8 +1,8 @@
-import { config, getPath } from '../../../server/config'
+import { config, getPath } from '../../../server/config.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
-import { Service } from '../../../server/service'
+import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
-import { generateReadableStream } from '../../utils/testUtil'
+import { generateReadableStream } from '../../utils/testUtil.js'
 
 const { page, constant } = config
 

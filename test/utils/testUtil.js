@@ -2,7 +2,7 @@ import { Readable, Writable, Transform } from 'stream'
 import { jest } from '@jest/globals'
 import portfinder from 'portfinder'
 import supertest from 'supertest'
-import { config } from '../../server/config'
+import { config } from '../../server/config.js'
 import { JSDOM } from 'jsdom'
 
 export const generateReadableStream = (data) => new Readable({
