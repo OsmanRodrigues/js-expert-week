@@ -1,21 +1,21 @@
 import { config } from "./config.js"
 
-const { constant, action } = config
+const { constant } = config
 
 export class View {
 
   constructor() {
     this.btnStart = document.getElementById(constant.id.button.start)
     this.btnStop = document.getElementById(constant.id.button.stop)
-    this.btnCommandList = Array.from(document.querySelectorAll(`[name=${constant.name.button.command}]`))
+    this.btnCommandList = document.querySelectorAll(`[name=${constant.name.button.command}]`)
     async function onBtnClick() { }
     this.onBtnClick = onBtnClick
   }
 
   onLoad() {
     this.toggleCommandBtnVisibility()
-    this.btnStart.addEventListener('click', this.handleBtnStartStopClick.bind(this))
-    this.btnStop.addEventListener('click', this.handleBtnStartStopClick.bind(this))
+    this.btnStart.onclick = this.handleBtnStartStopClick.bind(this)
+    this.btnStop.onclick = this.handleBtnStartStopClick.bind(this)
   }
 
   configureOnBtnClick(fn) {

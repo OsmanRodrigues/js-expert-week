@@ -71,7 +71,7 @@ const routes = async (req, res) => {
         case req.url.includes(location.controller):
           const data = await once(req, 'data')
           const parsedData = JSON.parse(data)
-          const result = controller.handleStreamingCommand(parsedData)
+          const result = await controller.handleStreamingCommand(parsedData)
           const parsedResult = JSON.stringify(result)
           
           return res.end(parsedResult)
