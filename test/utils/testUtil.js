@@ -17,7 +17,7 @@ export const generateReadableStream = (data) => new Readable({
 
 export const generateWritableStream = (onData) => new Writable({
   write(chunk, enc, cb) {
-    onData(chunk)
+    onData?.(chunk)
 
     cb(null, chunk)
   }
@@ -25,7 +25,7 @@ export const generateWritableStream = (onData) => new Writable({
 
 export const defaultHandleParams = () => {
   const requestStream = generateReadableStream(['req body'])
-  const responseStream = generateWritableStream(() => { })
+  const responseStream = generateWritableStream()
   const data = {
     request: {
       ...requestStream,

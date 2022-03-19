@@ -2,7 +2,7 @@ import fs from 'fs'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { setTimeout } from 'timers/promises'
 import { config, getPath } from '../../../server/config.js'
-import { server as apiServer } from '../../../server/server.js'
+import { startServer } from '../../../server/server.js'
 import { mutationSender, getTestServer, pipeAndReadStreamData } from '../../utils/testUtil.js'
 
 const { location, constant, page, statusCode } = config
@@ -15,7 +15,7 @@ describe('#API e2e', () => {
 
   describe('Client workflow', () => {
     test('It should not receive data stream if the proccess is not playing', async () => {  
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const onChunk = jest.fn()
       pipeAndReadStreamData(
         server.testServer.get(location.stream),
@@ -30,7 +30,7 @@ describe('#API e2e', () => {
     })
     
     test('It should receive data stream if the proccess has playing', async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const onChunk = jest.fn()
       const {
         send
@@ -56,7 +56,7 @@ describe('#API e2e', () => {
     })
 
     test(`GET "/" ~ It should receive location "/home" header and status 304`, async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const mainRoute = location.main
       const result = await server.testServer.get(mainRoute)
 
@@ -67,7 +67,7 @@ describe('#API e2e', () => {
     })
 
     test('GET /home ~ It should receive text/html file and status code 200', async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const expectedPageFile = fs.readFileSync(getPath(`/public${page.home}`)).toString()
       const result = await server.testServer.get(location.home)
       
@@ -79,7 +79,7 @@ describe('#API e2e', () => {
     })
 
     test('GET /controller ~ It should receive text/html file and status code 200', async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const expectedPageFile = fs.readFileSync(getPath(`/public${page.controller}`)).toString()
       const result = await server.testServer.get(location.controller)
       
@@ -92,7 +92,7 @@ describe('#API e2e', () => {
 
     test(`GET /home/js/animation.js ~ It should receive application/javascript file 
     and status code 200`, async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const endpoint = '/home/js/animation.js'
       const expectedPageFile = fs.readFileSync(getPath(`/public${endpoint}`)).toString()
       const result = await server.testServer.get(endpoint)
@@ -106,7 +106,7 @@ describe('#API e2e', () => {
 
     test(`GET /controller/css/style.css ~ It should receive text/css file 
     and status code 200`, async () => {
-      const server = await getTestServer(apiServer)
+      const server = await getTestServer(startServer())
       const endpoint = '/controller/css/style.css'
       const expectedPageFile = fs.readFileSync(getPath(`/public${endpoint}`)).toString()
       const result = await server.testServer.get(endpoint)
@@ -120,7 +120,7 @@ describe('#API e2e', () => {
 
     describe('Exceptions', () => {
       test(`When access a inexistent route, should receive not found error and status code 404`, async () => {
-        const server = await getTestServer(apiServer)
+        const server = await getTestServer(startServer())
         const inexistentRoute = '/foo'
         const result = await server.testServer.get(inexistentRoute)
         const expectedStatusCode = statusCode['NOT_FOUND']
@@ -133,7 +133,7 @@ describe('#API e2e', () => {
       })
 
       test(`When access a inexistent file, should receive not found error and status code 404`, async () => {
-        const server = await getTestServer(apiServer)
+        const server = await getTestServer(startServer())
         const inexistentFilePath = '/home/assets/photo.png'
         const result = await server.testServer.get(inexistentFilePath)
         const expectedStatusCode = statusCode['NOT_FOUND']

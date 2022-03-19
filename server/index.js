@@ -1,8 +1,8 @@
 import { config } from "./config.js"
-import { server } from "./server.js"
+import { startServer } from "./server.js"
 import { logger } from "./utils.js"
 
-server
+startServer()
   .listen(config.port)
   .on('listening', () => logger.info(`Server running at port ${config.port}`))
   
