@@ -1,0 +1,11 @@
+before all, create and setup a heroku.yml file
+
+heroku login
+heroku apps:create ocmr-spotify-radio
+git remote -v
+heroku stack:set container
+git push heroku main
+heroku open
+heroku logs -t -a ocmr-spotify-radio
+
+heroku apps:delete
