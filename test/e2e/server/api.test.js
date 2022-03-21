@@ -4,6 +4,7 @@ import { setTimeout } from 'timers/promises'
 import { config, getPath } from '../../../server/config.js'
 import { startServer } from '../../../server/server.js'
 import { mutationSender, getTestServer, pipeAndReadStreamData } from '../../utils/testUtil.js'
+import { config as testConfig } from '../../utils/config.js'
 
 const { location, constant, page, statusCode } = config
 
@@ -22,7 +23,7 @@ describe('#API e2e', () => {
         onChunk
       )
       
-      await setTimeout(constant.util.test.retentionDataPeriod)
+      await setTimeout(testConfig.retentionDataPeriod)
       server.kill()
 
       expect(onChunk).not.toHaveBeenCalled()
@@ -39,10 +40,10 @@ describe('#API e2e', () => {
         server.testServer.get(location.stream),
         onChunk
       )
-      const { command } = constant.util.test.e2e
+      const { command } = testConfig
 
       await send(command.req.start, command.res.started)
-      await setTimeout(constant.util.test.retentionDataPeriod)
+      await setTimeout(testConfig.retentionDataPeriod)
       await send(command.req.stop, command.res.stopped)
       
       const [[

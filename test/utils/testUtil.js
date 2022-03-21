@@ -23,7 +23,7 @@ export const generateWritableStream = (onData) => new Writable({
   }
 })
 
-export const defaultHandleParams = () => {
+export const generateDefaultHandleParams = () => {
   const requestStream = generateReadableStream(['req body'])
   const responseStream = generateWritableStream()
   const data = {
