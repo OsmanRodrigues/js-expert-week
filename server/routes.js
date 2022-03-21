@@ -74,6 +74,10 @@ const routes = async (req, res) => {
           const result = await controller.handleStreamingCommand(parsedData)
           const parsedResult = JSON.stringify(result)
           
+          if (!!result.error && result.error.toLocaleLowerCase().includes('not found')) {
+            res.writeHead(statusCode['NOT_FOUND'])
+          }
+
           return res.end(parsedResult)
       
         default:

@@ -24,12 +24,16 @@ export class Controller {
         this.service.stopStreaming()
         return { result: 'stopped' }
       
-      default:
+      case !!await this.service.getFxFileByName(safeCommand):
         const fxFilePath = await this.service.getFxFileByName(safeCommand)
         logger.info(`Choosen fx: ${fxFilePath}`)
         this.service.appendFxStream(fxFilePath)
 
         return { result: `${safeCommand} executed successfully` }
+      
+      default:
+        return { error: `Command "${safeCommand}" not found` }
+        
     }
 
   }
