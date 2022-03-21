@@ -35,80 +35,109 @@ describe('#Controller', () => {
     expect(Service.prototype.getFileStream).toHaveBeenCalledWith(expectedFileName)
     expect(expectedFileStream).toStrictEqual(mockedResolvedValue)
   })
-
-  test(`handleStreamingCommand() ~ Once receive command=start, should call service.startStreaming and 
-  return result=started`, async () => {
-    const { command } = testConfig
-    jest.spyOn(
-      Service.prototype,
-      'startStreaming'
-    )
-
-    const controller = new Controller()
-    const expectedResult = await controller.handleStreamingCommand(command.req.start)
-
-    expect(Service.prototype.startStreaming).toHaveBeenCalled()
-    expect(expectedResult).toStrictEqual(command.res.started)
-  })
-
-  test(`handleStreamingCommand() ~ Once receive command=stop, should call service.stopStreaming and 
-  return result=stopped`, async () => {
-    const { command } = testConfig
-    jest.spyOn(
-      Service.prototype,
-      'stopStreaming'
-    )
-
-    const controller = new Controller()
-    const expectedResult = await controller.handleStreamingCommand(command.req.stop)
-
-    expect(Service.prototype.stopStreaming).toHaveBeenCalled()
-    expect(expectedResult).toStrictEqual(command.res.stopped)
-  })
-
-  test(`handleStreamingCommand() ~ Once receive command=Applause, should call service.getFxFileByName, 
-  service.appendFxStream and return result='Applause executed successfully'`, async () => {
-    const { command } = testConfig
-    const expectedCommand = 'Applause'
-    const safeCommand = expectedCommand.toLowerCase()
-    const expectedFxFilePath = getPath('/audio/fx/Applause Sound Effect HD No Copyright (128 kbps).mp3')
-    const expectedReturnedResult = { result: `${safeCommand} executed successfully` }
-
-    jest.spyOn(
-      Service.prototype,
-      'startStreaming'
-    ).mockResolvedValue()
-    jest.spyOn(
-      Service.prototype,
-      'getFxFileByName'
-    ).mockResolvedValue(expectedFxFilePath)
-    jest.spyOn(
-      Service.prototype,
-      'appendFxStream'
-    ).mockReturnValue()
-    jest.spyOn(
-      Service.prototype,
-      'stopStreaming'
-    ).mockResolvedValue()
-
-    const controller = new Controller()
-    await controller.handleStreamingCommand(command.req.start)
-    setTimeout(testConfig.retentionDataPeriod)
-    const expectedResult = await controller.handleStreamingCommand({ command: safeCommand })
-    setTimeout(testConfig.retentionDataPeriod)
-    await controller.handleStreamingCommand(command.req.stop)
-
-    expect(Service.prototype.getFxFileByName).toHaveBeenCalledWith(safeCommand)
-    expect(Service.prototype.appendFxStream).toHaveBeenCalledWith(expectedFxFilePath)
-    expect(expectedResult).toStrictEqual(expectedReturnedResult)
-  })
-
-  test(`handleStreamingCommand() ~ Once receive command=unknow, should return result=Command "unknow" not found`, async () => { 
-    const expectedCommand = 'unknow'
   
-    const controller = new Controller()
-    const expectedResult = await controller.handleStreamingCommand({ command: expectedCommand })
+  test(`createClientStream() ~ Should call service.createClientStream, return a object with stream and 
+  onClose, once onClose is called, call service.removeClientStream`, async () => {
+    const mockStream = generateReadableStream(['data'])
+    const mockId = 'id'
 
-    expect(expectedResult).toStrictEqual({error: `Command "${expectedCommand}" not found`})
+    jest.spyOn(
+      Service.prototype,
+      'createClientStream'
+    ).mockReturnValue({
+      id: mockId,
+      clientStream: mockStream
+    })
+    jest.spyOn(
+      Service.prototype,
+      'removeClientStream'
+    ).mockReturnValue()
+
+    const controller = new Controller()
+    const { stream, onClose } = controller.createClientStream()
+    
+    onClose()
+
+    expect(stream).toStrictEqual(mockStream)
+    expect(Service.prototype.createClientStream).toHaveBeenCalled()
+    expect(Service.prototype.removeClientStream).toHaveBeenCalledWith(mockId)
+  })
+
+  describe('handleStreamingCommand()', () => {
+    test(`~ Once receive command=start, should call service.startStreaming and 
+    return result=started`, async () => {
+      const { command } = testConfig
+      jest.spyOn(
+        Service.prototype,
+        'startStreaming'
+      )
+
+      const controller = new Controller()
+      const expectedResult = await controller.handleStreamingCommand(command.req.start)
+
+      expect(Service.prototype.startStreaming).toHaveBeenCalled()
+      expect(expectedResult).toStrictEqual(command.res.started)
+    })
+
+    test(`~ Once receive command=stop, should call service.stopStreaming and 
+    return result=stopped`, async () => {
+      const { command } = testConfig
+      jest.spyOn(
+        Service.prototype,
+        'stopStreaming'
+      )
+
+      const controller = new Controller()
+      const expectedResult = await controller.handleStreamingCommand(command.req.stop)
+
+      expect(Service.prototype.stopStreaming).toHaveBeenCalled()
+      expect(expectedResult).toStrictEqual(command.res.stopped)
+    })
+
+    test(`~ Once receive command=Applause, should call service.getFxFileByName, 
+    service.appendFxStream and return result='Applause executed successfully'`, async () => {
+      const { command } = testConfig
+      const expectedCommand = 'Applause'
+      const safeCommand = expectedCommand.toLowerCase()
+      const expectedFxFilePath = getPath('/audio/fx/Applause Sound Effect HD No Copyright (128 kbps).mp3')
+      const expectedReturnedResult = { result: `${safeCommand} executed successfully` }
+
+      jest.spyOn(
+        Service.prototype,
+        'startStreaming'
+      ).mockResolvedValue()
+      jest.spyOn(
+        Service.prototype,
+        'getFxFileByName'
+      ).mockResolvedValue(expectedFxFilePath)
+      jest.spyOn(
+        Service.prototype,
+        'appendFxStream'
+      ).mockReturnValue()
+      jest.spyOn(
+        Service.prototype,
+        'stopStreaming'
+      ).mockResolvedValue()
+
+      const controller = new Controller()
+      await controller.handleStreamingCommand(command.req.start)
+      setTimeout(testConfig.retentionDataPeriod)
+      const expectedResult = await controller.handleStreamingCommand({ command: safeCommand })
+      setTimeout(testConfig.retentionDataPeriod)
+      await controller.handleStreamingCommand(command.req.stop)
+
+      expect(Service.prototype.getFxFileByName).toHaveBeenCalledWith(safeCommand)
+      expect(Service.prototype.appendFxStream).toHaveBeenCalledWith(expectedFxFilePath)
+      expect(expectedResult).toStrictEqual(expectedReturnedResult)
+    })
+
+    test(`~ Once receive command=unknow, should return result=Command "unknow" not found`, async () => { 
+      const expectedCommand = 'unknow'
+    
+      const controller = new Controller()
+      const expectedResult = await controller.handleStreamingCommand({ command: expectedCommand })
+
+      expect(expectedResult).toStrictEqual({error: `Command "${expectedCommand}" not found`})
+    })
   })
 })
