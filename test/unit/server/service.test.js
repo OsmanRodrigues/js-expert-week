@@ -28,6 +28,20 @@ describe('#Service', () => {
     expect(service.clientStreams.set).toHaveBeenCalledWith(id, clientStream)
   })
 
+  test(`removeClientStream() ~ Should return an object with id and clientStream`, () => {
+    const service = new Service()
+
+    jest.spyOn(
+      service.clientStreams,
+      'delete'
+    ).mockReturnValue()
+      
+    const { id } = service.createClientStream()
+    service.removeClientStream(id)
+    
+    expect(service.clientStreams.delete).toHaveBeenCalledWith(id)
+  })
+
   test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
     const expectedFilePath = getPath(page.home)
     const mockFileStream = generateReadableStream(['data'])
