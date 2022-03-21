@@ -3,6 +3,7 @@ import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
 import { generateReadableStream } from '../../utils/testUtil.js'
+import { PassThrough } from 'stream'
 
 const { page, constant } = config
 
@@ -10,6 +11,21 @@ describe('#Service', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     jest.clearAllMocks()
+  })
+
+  test(`createClientStream() ~ Should return an object with id and clientStream`, () => {
+    const service = new Service()
+
+    jest.spyOn(
+      service.clientStreams,
+      'set'
+    ).mockReturnValue()
+    
+    const { id, clientStream } = service.createClientStream()
+    
+    expect(id.length).toBeGreaterThan(0)
+    expect(clientStream).toBeInstanceOf(PassThrough)
+    expect(service.clientStreams.set).toHaveBeenCalledWith(id, clientStream)
   })
 
   test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
