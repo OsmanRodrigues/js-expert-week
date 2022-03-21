@@ -177,6 +177,26 @@ describe('#Routes', () => {
       expect(params.response.end).toHaveBeenCalledWith(expectedResult)
     })
 
+    test(`"/controller ~ Once requested command=unknow, should respond with error=Command unknow not found`, async () => {
+      const params = generateDefaultHandleParams()
+      const expectedCommand = 'unknow'
+      const expectedData = JSON.stringify({ command: expectedCommand })
+      const expectedResult = { error: `Command "${expectedCommand}" not found` }
+
+      params.request.method = method.post
+      params.request.url = location.controller
+      params.request.push(expectedData)
+
+      jest.spyOn(
+        Controller.prototype,
+        'handleStreamingCommand'
+      ).mockResolvedValue(expectedResult)
+
+      await handler(...params.values())
+
+      expect(params.response.end).toHaveBeenCalledWith(JSON.stringify(expectedResult))
+    })
+
     test(`"/unknow" ~ Should respond with 404`,  async () => {
       const params = generateDefaultHandleParams()
       const expectedStatusCode = statusCode['NOT_FOUND']
