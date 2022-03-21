@@ -4,6 +4,7 @@ import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Controller } from '../../../server/controller.js'
 import { handler } from '../../../server/routes.js'
 import { config as testConfig } from '../../utils/config.js'
+import Events from 'events'
 
 const { method, location, page, constant, statusCode } = config
 
@@ -158,7 +159,36 @@ describe('#Routes', () => {
     test(`"/controller ~ Once requested command=start, should start client stream and respond with result=started`, async () => {
       const { command } = testConfig
       const params = generateDefaultHandleParams()
-      //const expectedBody = 
+      const expectedData = JSON.stringify(command.req.start)
+      const expectedResult = JSON.stringify(command.res.started)
+
+      params.request.method = method.post
+      params.request.url = location.controller
+      params.request.push(expectedData)
+
+      jest.spyOn(
+        Controller.prototype,
+        'handleStreamingCommand'
+      ).mockResolvedValue(command.res.started)
+
+      await handler(...params.values())
+
+      expect(Controller.prototype.handleStreamingCommand).toHaveBeenCalledWith(command.req.start)
+      expect(params.response.end).toHaveBeenCalledWith(expectedResult)
+    })
+
+    test(`"/unknow" ~ Should respond with 404`,  async () => {
+      const params = generateDefaultHandleParams()
+      const expectedStatusCode = statusCode['NOT_FOUND']
+      params.request.method = method.post
+      params.request.url = `/unknow`
+      
+      await handler(...params.values())
+
+      expect(params.response.writeHead).toHaveBeenCalledWith(expectedStatusCode)
+      expect(params.response.end).toHaveBeenCalledWith(
+        constant.fallback.route.statusCode[expectedStatusCode]
+      )
     })
   })
 
