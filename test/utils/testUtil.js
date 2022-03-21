@@ -27,17 +27,15 @@ export const defaultHandleParams = () => {
   const requestStream = generateReadableStream(['req body'])
   const responseStream = generateWritableStream()
   const data = {
-    request: {
-      ...requestStream,
+    request: Object.assign(requestStream, {
       headers: {},
       method: '',
       url: ''
-    },
-    response: {
-      ...responseStream,
+    }),
+    response: Object.assign(responseStream,{
       writeHead: jest.fn(),
       end: jest.fn()
-    }
+    })
   }
 
   return {

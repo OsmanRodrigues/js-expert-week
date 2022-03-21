@@ -49,7 +49,7 @@ const routes = async (req, res) => {
             onClose
           } = controller.createClientStream()
           req.once('close', onClose)
-          res.writeHead(200, {
+          res.writeHead(statusCode['OK'], {
             'Content-Type': constant.contentType[".mpeg"],
             'Accept-Ranges': constant.acceptRanges.bytes
           })

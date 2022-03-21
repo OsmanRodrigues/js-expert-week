@@ -73,7 +73,39 @@ describe('#Routes', () => {
     expect(Controller.prototype.getFileStream).toBeCalledWith(page.controller)
     expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
   })
-   
+  
+  test(`GET /stream ~ Should respond with /audio/songs/conversation.mp3 file stream`, async () => {
+    const params = defaultHandleParams()
+    params.request.method = method.get
+    params.request.url = location.stream
+    const mockFileStream = generateReadableStream(['data'])
+    const mockOnClose = jest.fn()
+    
+    jest.spyOn(
+      mockFileStream,
+      'pipe'
+    ).mockReturnValue()
+
+    jest.spyOn(
+      Controller.prototype,
+      'createClientStream'
+    ).mockReturnValue({
+      stream: mockFileStream,
+      onClose: mockOnClose
+    })
+
+    await handler(...params.values())
+    params.request.emit('close')
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(statusCode['OK'],{
+      'Content-Type': constant.contentType['.mpeg'],
+      'Accept-Ranges': constant.acceptRanges.bytes
+    })
+    expect(Controller.prototype.createClientStream).toHaveBeenCalled()
+    expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
+    expect(mockOnClose).toHaveBeenCalled()
+  })
+  
   test(`GET /file.ext ~ Should respond with file stream`,  async () => {
     const expectedType = '.css'
     const params = defaultHandleParams()
