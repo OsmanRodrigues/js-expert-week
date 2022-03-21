@@ -7,6 +7,23 @@ export class Controller {
     this.service = new Service()
   }
 
+  createClientStream() {
+    const { 
+      id,
+      clientStream
+    } = this.service.createClientStream()
+
+    const onClose = () => {
+      logger.info(`Closing connection stream of ${id}`)
+      this.service.removeClientStream(id)
+    }
+
+    return {
+      stream: clientStream,
+      onClose
+    }
+  }
+
   async getFileStream(fileName){
     return this.service.getFileStream(fileName)
   }
@@ -36,23 +53,6 @@ export class Controller {
         
     }
 
-  }
-  
-  createClientStream() {
-    const { 
-      id,
-      clientStream
-    } = this.service.createClientStream()
-
-    const onClose = () => {
-      logger.info(`Closing connection stream of ${id}`)
-      this.service.removeClientStream(id)
-    }
-
-    return {
-      stream: clientStream,
-      onClose
-    }
   }
   
 }

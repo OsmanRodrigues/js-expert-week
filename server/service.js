@@ -20,6 +20,50 @@ export class Service {
     this.currentStreamingFilePath = ''
   }
 
+  _executeSoxCommand(args) {
+    return childProcess.spawn('sox', args)
+  }
+
+  appendFxStream(fxFile) {
+    const currentThrottleTransform = new Throttle(this.currentBitRate)
+    streamPromises.pipeline(
+      currentThrottleTransform,
+      this.broadCast()
+    )
+    const unpipe = () => {
+      const transformableStream = this.mergeAudioStreams(fxFile, this.currentReadable)
+      this.throttleTransform = currentThrottleTransform
+      this.currentReadable = transformableStream
+      this.currentReadable.removeListener('unpipe', unpipe)
+      
+      streamPromises.pipeline(
+        transformableStream,
+        currentThrottleTransform
+      )
+    }
+
+    this.throttleTransform.on('unpipe', unpipe)
+    this.throttleTransform.pause()
+    this.currentReadable.unpipe(this.throttleTransform)
+  }
+
+  broadCast() {
+    return new Writable({
+      write: (chunk, enc, cb) => {
+        for (const [id, stream] of this.clientStreams) {
+          if (!!stream.writableEnded) {
+            this.clientStreams.delete(id)
+            continue
+          }
+
+          stream.write(chunk)
+        }
+
+        cb()
+      }
+    })
+  }
+
   createClientStream() {
     const id = randomUUID()
     const clientStream = new PassThrough()
@@ -31,12 +75,17 @@ export class Service {
     }
   }
 
-  removeClientStream(id) {
-    this.clientStreams.delete(id)
-  }
+  createFileStream(filePath) {
+    return fs.createReadStream(filePath)
+  } 
 
-  _executeSoxCommand(args) {
-    return childProcess.spawn('sox', args)
+  async getFxFileByName(fxName) {
+    const fxFilesPaths = await fsPromises.readdir(config.dir.fx)
+    const choosenFxFilePath = fxFilesPaths.find(filePath => filePath.toLowerCase().includes(fxName))
+
+    if (!choosenFxFilePath) return Promise.reject(`Fx file "${fxName}" not found.`)
+    
+    return `${config.dir.fx}/${choosenFxFilePath}`
   }
 
   async getBitRate(file) {
@@ -73,53 +122,6 @@ export class Service {
       return constant.audio.fallbackBitRate
     }
   }
-
-  broadCast() {
-    return new Writable({
-      write: (chunk, enc, cb) => {
-        for (const [id, stream] of this.clientStreams) {
-          if (!!stream.writableEnded) {
-            this.clientStreams.delete(id)
-            continue
-          }
-
-          stream.write(chunk)
-        }
-
-        cb()
-      }
-    })
-  }
-
-  async startStreaming() {
-    this.currentStreamingFilePath = constant.audio.file.englishConversation.dir
-    logger.info(`Starting streaming of ${this.currentStreamingFilePath}.`)
-    this.currentBitRate = (await this.getBitRate(this.currentStreamingFilePath)) / constant.audio.bitRateDivisor
-    this.throttleTransform = new Throttle(this.currentBitRate)
-    this.currentReadable = this.createFileStream(this.currentStreamingFilePath)
-
-    return streamPromises.pipeline(
-      this.currentReadable,
-      this.throttleTransform,
-      this.broadCast()
-    )
-  }
-
-  stopStreaming() {
-    if (!this.throttleTransform?._writableState) {
-      logger.info('Streaming not started yet.')
-    }
-    else if (!this.throttleTransform?._writableState.ended) {
-      this.throttleTransform.end()
-      logger.info('Streaming stopped succesfully.')
-    } else {
-      logger.info('Streaming already stopped.');
-    }
-  }
-
-  createFileStream(filePath) {
-    return fs.createReadStream(filePath)
-  } 
   
   async getFileInfo(fileName){
     const publicFilePath = getPath(`public/${fileName}`)
@@ -138,38 +140,6 @@ export class Service {
       stream: this.createFileStream(path),
       type
     }
-  }
-
-  async getFxFileByName(fxName) {
-    const fxFilesPaths = await fsPromises.readdir(config.dir.fx)
-    const choosenFxFilePath = fxFilesPaths.find(filePath => filePath.toLowerCase().includes(fxName))
-
-    if (!choosenFxFilePath) return Promise.reject(`Fx file "${fxName}" not found.`)
-    
-    return `${config.dir.fx}/${choosenFxFilePath}`
-  }
-
-  appendFxStream(fxFile) {
-    const currentThrottleTransform = new Throttle(this.currentBitRate)
-    streamPromises.pipeline(
-      currentThrottleTransform,
-      this.broadCast()
-    )
-    const unpipe = () => {
-      const transformableStream = this.mergeAudioStreams(fxFile, this.currentReadable)
-      this.throttleTransform = currentThrottleTransform
-      this.currentReadable = transformableStream
-      this.currentReadable.removeListener('unpipe', unpipe)
-      
-      streamPromises.pipeline(
-        transformableStream,
-        currentThrottleTransform
-      )
-    }
-
-    this.throttleTransform.on('unpipe', unpipe)
-    this.throttleTransform.pause()
-    this.currentReadable.unpipe(this.throttleTransform)
   }
 
   mergeAudioStreams(fxFile, currentAudioReadable) {
@@ -205,6 +175,36 @@ export class Service {
     //.catch(err => `Error on receiving stream from sox: ${err}`)
     
     return transformStream
+  }
+
+  removeClientStream(id) {
+    this.clientStreams.delete(id)
+  }
+
+  async startStreaming() {
+    this.currentStreamingFilePath = constant.audio.file.englishConversation.dir
+    logger.info(`Starting streaming of ${this.currentStreamingFilePath}.`)
+    this.currentBitRate = (await this.getBitRate(this.currentStreamingFilePath)) / constant.audio.bitRateDivisor
+    this.throttleTransform = new Throttle(this.currentBitRate)
+    this.currentReadable = this.createFileStream(this.currentStreamingFilePath)
+
+    return streamPromises.pipeline(
+      this.currentReadable,
+      this.throttleTransform,
+      this.broadCast()
+    )
+  }
+
+  stopStreaming() {
+    if (!this.throttleTransform?._writableState) {
+      logger.info('Streaming not started yet.')
+    }
+    else if (!this.throttleTransform?._writableState.ended) {
+      this.throttleTransform.end()
+      logger.info('Streaming stopped succesfully.')
+    } else {
+      logger.info('Streaming already stopped.');
+    }
   }
 
 }
