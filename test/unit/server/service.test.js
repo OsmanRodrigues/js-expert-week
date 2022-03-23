@@ -2,10 +2,10 @@ import { config, getPath } from '../../../server/config.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
-import { promises as streamPromises, Writable } from 'stream'
+import { promises as streamPromises, Writable, PassThrough } from 'stream'
 import { generateReadableStream, generateWritableStream } from '../../utils/testUtil.js'
-import { PassThrough } from 'stream'
 import Throttle from 'throttle'
+import childProcess from 'child_process'
 
 const { page, constant } = config
 
@@ -236,7 +236,40 @@ describe('#Service', () => {
     expect(expectedFxFilePathResult).toStrictEqual(expectedNotFoundErrorMsg)
   })
 
-  test.todo('mergeAudioStreams() ~ ')
+  test(`mergeAudioStreams() ~ Should call service._executeSoxCommand, streamPromises.pipeline and 
+  return a transformStream PassThrough instance`, async () => {
+    const service = new Service()
+    const fxFileMock = '/foo/test.mp3'
+    const currentAudioReadableMock = generateReadableStream(['data'])
+    const argsMock = [
+      '-t', constant.audio.mediaType,
+      '-v', constant.audio.songVolume,
+      '-m', '-',
+      '-t', constant.audio.mediaType,
+      '-v', constant.audio.fxVolume,
+      fxFileMock,
+      '-t', constant.audio.mediaType,
+      '-'
+    ]
+    const childProcessMock = childProcess.spawn('sox', argsMock)
+
+    jest.spyOn(
+      service,
+      '_executeSoxCommand'
+    ).mockReturnValue(childProcessMock)
+    jest.spyOn(
+      streamPromises,
+      'pipeline'
+    )
+    .mockResolvedValueOnce()
+    .mockResolvedValueOnce()
+    
+    const mergeAudioResult = service.mergeAudioStreams(fxFileMock, currentAudioReadableMock)
+
+    expect(service._executeSoxCommand).toHaveBeenCalledWith(argsMock)
+    expect(mergeAudioResult).toBeInstanceOf(PassThrough)
+  })
+
   test.todo('startStreaming() ~ ')
   test.todo('stopStreaming() ~ ')
 })
