@@ -174,7 +174,30 @@ describe('#Service', () => {
     expect(expectedFxFilePathResult).toStrictEqual(expectedFxFilePath)
   })
 
-  test.todo(`getBitRate() ~`)
+  test(`getBitRate() ~ Should call service._executeSoxCommand and return a bit rate in string`, async () => {
+    const service = new Service()
+    const currentFile = 'file.mp3'
+    const expectedArgs = [
+      '--i',
+      '-B',
+      currentFile
+    ]
+    const stdoutMock = '1k'
+    const expectedBitRate = '1000'
+    const childProcessMock = getSpawnResponse({
+      stdout: stdoutMock,
+    })
+
+    jest.spyOn(
+      service,
+      '_executeSoxCommand'
+    ).mockReturnValue(childProcessMock)
+    
+    const getBitRateResult = await service.getBitRate(currentFile)
+
+    expect(getBitRateResult).toStrictEqual(expectedBitRate)
+    expect(service._executeSoxCommand).toHaveBeenCalledWith(expectedArgs)
+  })
 
   test(`getFileInfo() ~ Should call fsPromises.access and return an object with type and path`,
     async () => {
