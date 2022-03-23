@@ -15,101 +15,8 @@ describe('#Service', () => {
     jest.clearAllMocks()
   })
 
-  test(`createClientStream() ~ Should return an object with id and clientStream`, () => {
-    const service = new Service()
+  test.todo(`_executeSoxCommand() ~`)
 
-    jest.spyOn(
-      service.clientStreams,
-      'set'
-    ).mockReturnValue()
-    
-    const { id, clientStream } = service.createClientStream()
-    
-    expect(id.length).toBeGreaterThan(0)
-    expect(clientStream).toBeInstanceOf(PassThrough)
-    expect(service.clientStreams.set).toHaveBeenCalledWith(id, clientStream)
-  })
-
-  test(`removeClientStream() ~ Should return an object with id and clientStream`, () => {
-    const service = new Service()
-
-    jest.spyOn(
-      service.clientStreams,
-      'delete'
-    ).mockReturnValue()
-      
-    const { id } = service.createClientStream()
-    service.removeClientStream(id)
-    
-    expect(service.clientStreams.delete).toHaveBeenCalledWith(id)
-  })
-
-  test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
-    const expectedFilePath = getPath(page.home)
-    const mockFileStream = generateReadableStream(['data'])
-    
-    jest.spyOn(
-      fs,
-      'createReadStream'
-    ).mockResolvedValue(
-      mockFileStream
-    )
-    
-    const service = new Service()
-    const expectedFileStream = service.createFileStream(expectedFilePath)
-
-    expect(fs.createReadStream).toBeCalledWith(expectedFilePath)
-    expect(expectedFileStream).resolves.toStrictEqual(mockFileStream)
-  })
-  
-  test(`getFileInfo() ~ Should call fsPromises.access and return an object with type and path`,
-    async () => {
-    const expectedFileName = page.controller
-    const expectedFilePath = getPath(`public/${page.controller}`)
-    const expectedFileExt = constant.fileExt.html
-
-    jest.spyOn(
-      fsPromises,
-      'access'
-    ).mockResolvedValue()
-
-    const service = new Service()
-    const expectedFileInfo = await service.getFileInfo(expectedFileName)
-
-    expect(fsPromises.access).toHaveBeenCalledWith(expectedFilePath)
-    expect(expectedFileInfo).toStrictEqual({ type: expectedFileExt, path: expectedFilePath })
-  })
-  
-  test('getFileStream() ~ Should call getFileInfo and createFileStream, returning an object with stream and type',
-    async () => {
-    const expectedFileName = page.home
-    const expectedFilePath = getPath(`public/${page.home}`)
-    const expectedFileExt = constant.fileExt.html;
-    const mockFileStream = generateReadableStream(['data'])
-
-    jest.spyOn(
-      Service.prototype,
-      'getFileInfo'
-    ).mockResolvedValue({
-      path: expectedFilePath,
-      type: expectedFileExt
-    })
-
-    jest.spyOn(
-      Service.prototype,
-      'createFileStream'
-    ).mockReturnValue(
-      mockFileStream
-    )
-
-    const service = new Service()
-    const expectedFileStream = await service.getFileStream(expectedFileName)
-    
-    expect(Service.prototype.getFileInfo).toHaveBeenCalledWith(expectedFileName)
-    expect(Service.prototype.createFileStream).toHaveBeenCalledWith(expectedFilePath)
-    expect(expectedFileStream).toStrictEqual({ stream: mockFileStream, type: expectedFileExt })
-  })
-  
   test(`appendFxStream() ~ Should call streamPromises.pipeline, this.mergeAudioStreams, 
   currentReadable.removeListener, throttleTransform.on, throttleTransform.pause and currentReadable.unpipe`, async () => {
     const currentFx = 'fx.mp3'
@@ -199,6 +106,39 @@ describe('#Service', () => {
     expect(onDataMock).toHaveBeenCalledTimes(1)
   })
 
+  test(`createClientStream() ~ Should return an object with id and clientStream`, () => {
+    const service = new Service()
+
+    jest.spyOn(
+      service.clientStreams,
+      'set'
+    ).mockReturnValue()
+    
+    const { id, clientStream } = service.createClientStream()
+    
+    expect(id.length).toBeGreaterThan(0)
+    expect(clientStream).toBeInstanceOf(PassThrough)
+    expect(service.clientStreams.set).toHaveBeenCalledWith(id, clientStream)
+  })
+
+  test('createFileStream() ~ Should call fs.CreateStream and return a readable stream', () => {
+    const expectedFilePath = getPath(page.home)
+    const mockFileStream = generateReadableStream(['data'])
+    
+    jest.spyOn(
+      fs,
+      'createReadStream'
+    ).mockResolvedValue(
+      mockFileStream
+    )
+    
+    const service = new Service()
+    const expectedFileStream = service.createFileStream(expectedFilePath)
+
+    expect(fs.createReadStream).toBeCalledWith(expectedFilePath)
+    expect(expectedFileStream).resolves.toStrictEqual(mockFileStream)
+  })
+
   test('getFxFileByName() ~ Should call fsPromises.readdir, find a current fx and return the file path', async () => {
     const service = new Service()
     const currentFx = 'fx.mp3'
@@ -215,25 +155,54 @@ describe('#Service', () => {
     expect(expectedFxFilePathResult).toStrictEqual(expectedFxFilePath)
   })
 
-  test(`getFxFileByName() ~ Once received a unknow.mp3 file, should return a not found error`, async () => {
-    const service = new Service()
-    const currentFx = 'unknow.mp3'
-    const expectedNotFoundErrorMsg = `Fx file "${currentFx}" not found.`
-    const fxFilesPathsMock = [`path/foo.mp3`]
-    
+  test.todo(`getBitRate() ~`)
+
+  test(`getFileInfo() ~ Should call fsPromises.access and return an object with type and path`,
+    async () => {
+    const expectedFileName = page.controller
+    const expectedFilePath = getPath(`public/${page.controller}`)
+    const expectedFileExt = constant.fileExt.html
+
     jest.spyOn(
       fsPromises,
-      'readdir'
-    ).mockResolvedValue(fxFilesPathsMock)
-    jest.spyOn(
-      Promise,
-      'reject'
-    ).mockResolvedValue(expectedNotFoundErrorMsg)
+      'access'
+    ).mockResolvedValue()
 
-    const expectedFxFilePathResult = await service.getFxFileByName(currentFx)
+    const service = new Service()
+    const expectedFileInfo = await service.getFileInfo(expectedFileName)
+
+    expect(fsPromises.access).toHaveBeenCalledWith(expectedFilePath)
+    expect(expectedFileInfo).toStrictEqual({ type: expectedFileExt, path: expectedFilePath })
+  })
+
+  test('getFileStream() ~ Should call getFileInfo and createFileStream, returning an object with stream and type',
+    async () => {
+    const expectedFileName = page.home
+    const expectedFilePath = getPath(`public/${page.home}`)
+    const expectedFileExt = constant.fileExt.html;
+    const mockFileStream = generateReadableStream(['data'])
+
+    jest.spyOn(
+      Service.prototype,
+      'getFileInfo'
+    ).mockResolvedValue({
+      path: expectedFilePath,
+      type: expectedFileExt
+    })
+
+    jest.spyOn(
+      Service.prototype,
+      'createFileStream'
+    ).mockReturnValue(
+      mockFileStream
+    )
+
+    const service = new Service()
+    const expectedFileStream = await service.getFileStream(expectedFileName)
     
-    expect(Promise.reject).toHaveBeenCalledWith(expectedNotFoundErrorMsg)
-    expect(expectedFxFilePathResult).toStrictEqual(expectedNotFoundErrorMsg)
+    expect(Service.prototype.getFileInfo).toHaveBeenCalledWith(expectedFileName)
+    expect(Service.prototype.createFileStream).toHaveBeenCalledWith(expectedFilePath)
+    expect(expectedFileStream).toStrictEqual({ stream: mockFileStream, type: expectedFileExt })
   })
 
   test(`mergeAudioStreams() ~ Should call service._executeSoxCommand, streamPromises.pipeline and 
@@ -270,6 +239,42 @@ describe('#Service', () => {
     expect(mergeAudioResult).toBeInstanceOf(PassThrough)
   })
 
+  test(`removeClientStream() ~ Should return an object with id and clientStream`, () => {
+    const service = new Service()
+
+    jest.spyOn(
+      service.clientStreams,
+      'delete'
+    ).mockReturnValue()
+      
+    const { id } = service.createClientStream()
+    service.removeClientStream(id)
+    
+    expect(service.clientStreams.delete).toHaveBeenCalledWith(id)
+  })
+
   test.todo('startStreaming() ~ ')
+
   test.todo('stopStreaming() ~ ')
+
+  test(`getFxFileByName() ~ Once received a unknow.mp3 file, should return a not found error`, async () => {
+    const service = new Service()
+    const currentFx = 'unknow.mp3'
+    const expectedNotFoundErrorMsg = `Fx file "${currentFx}" not found.`
+    const fxFilesPathsMock = [`path/foo.mp3`]
+    
+    jest.spyOn(
+      fsPromises,
+      'readdir'
+    ).mockResolvedValue(fxFilesPathsMock)
+    jest.spyOn(
+      Promise,
+      'reject'
+    ).mockResolvedValue(expectedNotFoundErrorMsg)
+
+    const expectedFxFilePathResult = await service.getFxFileByName(currentFx)
+    
+    expect(Promise.reject).toHaveBeenCalledWith(expectedNotFoundErrorMsg)
+    expect(expectedFxFilePathResult).toStrictEqual(expectedNotFoundErrorMsg)
+  })
 })
