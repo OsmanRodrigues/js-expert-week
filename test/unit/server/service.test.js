@@ -2,7 +2,7 @@ import { config, getPath } from '../../../server/config.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
-import { promises as streamPromises } from 'stream'
+import { promises as streamPromises, Writable } from 'stream'
 import { generateReadableStream, generateWritableStream } from '../../utils/testUtil.js'
 import { PassThrough } from 'stream'
 import Throttle from 'throttle'
@@ -121,8 +121,7 @@ describe('#Service', () => {
     const writableBroadcasterResult = generateWritableStream(()=>{})
     const expectedFirstCallResult = 'ok1'
     const expectedSecondCallResult = 'ok2'
-    const unpipe = () => {}
-
+   
     jest.spyOn(
       streamPromises,
       'pipeline'
@@ -176,7 +175,30 @@ describe('#Service', () => {
     expect(service.currentReadable.removeListener).toHaveBeenCalled()
   })
 
-  test.todo('broadCast() ~ ')
+  test(`broadCast() ~ Should interate over this.clientStreams, call stream.write, clientStreams.delete, 
+  cb, and return a writable`, () => {
+    const service = new Service()
+    const onDataMock = jest.fn()
+    const clientStream1 = generateWritableStream(onDataMock)
+    const clientStream2 = generateWritableStream(onDataMock)
+
+    jest.spyOn(
+      service.clientStreams,
+      'delete'
+    ).mockReturnValue()
+    
+    service.clientStreams.set('1', clientStream1)
+    service.clientStreams.set('2', clientStream2)
+    clientStream2.end()
+    
+    const writableResult = service.broadCast()
+    writableResult.write('test')
+
+    expect(writableResult).toBeInstanceOf(Writable)
+    expect(service.clientStreams.delete).toHaveBeenCalled()
+    expect(onDataMock).toHaveBeenCalledTimes(1)
+  })
+
   test.todo('getFxFileByName() ~ ')
   test.todo('mergeAudioStreams() ~ ')
   test.todo('startStreaming() ~ ')
