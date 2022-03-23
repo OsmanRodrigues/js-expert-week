@@ -2,8 +2,10 @@ import { config, getPath } from '../../../server/config.js'
 import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
-import { generateReadableStream } from '../../utils/testUtil.js'
+import { promises as streamPromises } from 'stream'
+import { generateReadableStream, generateWritableStream } from '../../utils/testUtil.js'
 import { PassThrough } from 'stream'
+import Throttle from 'throttle'
 
 const { page, constant } = config
 
@@ -107,4 +109,76 @@ describe('#Service', () => {
     expect(Service.prototype.createFileStream).toHaveBeenCalledWith(expectedFilePath)
     expect(expectedFileStream).toStrictEqual({ stream: mockFileStream, type: expectedFileExt })
   })
+  
+  test(`appendFxStream() ~ Should call streamPromises.pipeline, this.mergeAudioStreams, 
+  currentReadable.removeListener, throttleTransform.on, throttleTransform.pause and currentReadable.unpipe`, async () => {
+    const currentFx = 'fx.mp3'
+    const service = new Service()
+    service.throttleTransform = new PassThrough()
+    service.currentReadable = generateReadableStream(['data'])
+    
+    const transformableStreamMock = new PassThrough()
+    const writableBroadcasterResult = generateWritableStream(()=>{})
+    const expectedFirstCallResult = 'ok1'
+    const expectedSecondCallResult = 'ok2'
+    const unpipe = () => {}
+
+    jest.spyOn(
+      streamPromises,
+      'pipeline'
+    )
+    .mockResolvedValueOnce(expectedFirstCallResult)
+    .mockResolvedValueOnce(expectedSecondCallResult)
+    jest.spyOn(
+      service,
+      'broadCast'
+    ).mockReturnValue(writableBroadcasterResult)
+    jest.spyOn(
+      service,
+      'mergeAudioStreams'
+    ).mockReturnValue(transformableStreamMock)
+    jest.spyOn(
+      transformableStreamMock,
+      'removeListener'
+    ).mockReturnValue()
+    jest.spyOn(
+      service.throttleTransform,
+      'pause'
+    ).mockReturnValue()
+    jest.spyOn(
+      service.currentReadable,
+      'unpipe'
+    ).mockReturnValue()
+    
+    service.appendFxStream(currentFx)
+    
+    expect(service.throttleTransform.pause).toHaveBeenCalled()
+    expect(service.currentReadable.unpipe).toHaveBeenCalledWith(service.throttleTransform)
+    
+    service.throttleTransform.emit('unpipe')
+    
+    const [call1, call2] = streamPromises.pipeline.mock.calls
+    const [resultCall1, resultCall2] = streamPromises.pipeline.mock.results
+    const [throttleTransformCall1, broadCastCall1] = call1 
+    
+    expect(throttleTransformCall1).toBeInstanceOf(Throttle)
+    expect(broadCastCall1).toStrictEqual(writableBroadcasterResult)
+    
+    const [result1, result2] = await Promise.all([resultCall1.value, resultCall2.value])
+    
+    expect(result1).toStrictEqual(expectedFirstCallResult)
+    expect(result2).toStrictEqual(expectedSecondCallResult)
+    
+    const [mergedStreamCall2, throttleTransformCall2] = call2
+
+    expect(mergedStreamCall2).toStrictEqual(transformableStreamMock)
+    expect(throttleTransformCall2).toBeInstanceOf(Throttle)
+    expect(service.currentReadable.removeListener).toHaveBeenCalled()
+  })
+
+  test.todo('broadCast() ~ ')
+  test.todo('getFxFileByName() ~ ')
+  test.todo('mergeAudioStreams() ~ ')
+  test.todo('startStreaming() ~ ')
+  test.todo('stopStreaming() ~ ')
 })
