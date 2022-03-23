@@ -176,7 +176,7 @@ describe('#Service', () => {
   })
 
   test(`broadCast() ~ Should interate over this.clientStreams, call stream.write, clientStreams.delete, 
-  cb, and return a writable`, () => {
+  cb and return a writable`, () => {
     const service = new Service()
     const onDataMock = jest.fn()
     const clientStream1 = generateWritableStream(onDataMock)
@@ -199,7 +199,43 @@ describe('#Service', () => {
     expect(onDataMock).toHaveBeenCalledTimes(1)
   })
 
-  test.todo('getFxFileByName() ~ ')
+  test('getFxFileByName() ~ Should call fsPromises.readdir, find a current fx and return the file path', async () => {
+    const service = new Service()
+    const currentFx = 'fx.mp3'
+    const fxFilesPathsMock = [`path/${currentFx}`]
+    const expectedFxFilePath = `${config.dir.fx}/${fxFilesPathsMock[0]}`
+    jest.spyOn(
+      fsPromises,
+      'readdir'
+    ).mockResolvedValue(fxFilesPathsMock)
+    
+    const expectedFxFilePathResult = await service.getFxFileByName(currentFx)
+    
+    expect(fsPromises.readdir).toHaveBeenCalledWith(config.dir.fx)
+    expect(expectedFxFilePathResult).toStrictEqual(expectedFxFilePath)
+  })
+
+  test(`getFxFileByName() ~ Once received a unknow.mp3 file, should return a not found error`, async () => {
+    const service = new Service()
+    const currentFx = 'unknow.mp3'
+    const expectedNotFoundErrorMsg = `Fx file "${currentFx}" not found.`
+    const fxFilesPathsMock = [`path/foo.mp3`]
+    
+    jest.spyOn(
+      fsPromises,
+      'readdir'
+    ).mockResolvedValue(fxFilesPathsMock)
+    jest.spyOn(
+      Promise,
+      'reject'
+    ).mockResolvedValue(expectedNotFoundErrorMsg)
+
+    const expectedFxFilePathResult = await service.getFxFileByName(currentFx)
+    
+    expect(Promise.reject).toHaveBeenCalledWith(expectedNotFoundErrorMsg)
+    expect(expectedFxFilePathResult).toStrictEqual(expectedNotFoundErrorMsg)
+  })
+
   test.todo('mergeAudioStreams() ~ ')
   test.todo('startStreaming() ~ ')
   test.todo('stopStreaming() ~ ')
