@@ -3,7 +3,7 @@ import { jest, expect, describe, test, beforeEach } from '@jest/globals'
 import { Service } from '../../../server/service.js'
 import fs, { promises as fsPromises } from 'fs'
 import { promises as streamPromises, Writable, PassThrough } from 'stream'
-import { generateReadableStream, generateWritableStream } from '../../utils/testUtil.js'
+import { generateReadableStream, generateWritableStream, getSpawnResponse } from '../../utils/testUtil.js'
 import Throttle from 'throttle'
 import childProcess from 'child_process'
 
@@ -15,7 +15,26 @@ describe('#Service', () => {
     jest.clearAllMocks()
   })
 
-  test.todo(`_executeSoxCommand() ~`)
+  test(`_executeSoxCommand() ~ Should return a child process object`, () => {
+    const service = new Service()
+    const argsMock = ['doit']
+    const command = 'sox'
+    const childProcessMock = getSpawnResponse({
+      stdout: 'stdout'
+    })
+
+    jest.spyOn(
+      childProcess,
+      'spawn'
+    ).mockReturnValue(
+      childProcessMock
+    )
+    
+    const executeSoxCommandResult = service._executeSoxCommand(argsMock)
+    
+    expect(childProcess.spawn).toHaveBeenCalledWith(command, argsMock)
+    expect(executeSoxCommandResult).toStrictEqual(childProcessMock)
+  })
 
   test(`appendFxStream() ~ Should call streamPromises.pipeline, this.mergeAudioStreams, 
   currentReadable.removeListener, throttleTransform.on, throttleTransform.pause and currentReadable.unpipe`, async () => {
@@ -220,7 +239,10 @@ describe('#Service', () => {
       '-t', constant.audio.mediaType,
       '-'
     ]
-    const childProcessMock = childProcess.spawn('sox', argsMock)
+    const childProcessMock = getSpawnResponse({
+      stdout: 'stdout',
+      stdin: 'stdin'
+    })
 
     jest.spyOn(
       service,

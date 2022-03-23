@@ -44,6 +44,16 @@ export const generateDefaultHandleParams = () => {
   }
 }
 
+export const getSpawnResponse = ({
+  stdout = '',
+  stderr = '',
+  stdin = () => {}
+}) => ({
+  stdout: generateReadableStream([stdout]),
+  stderr: generateReadableStream([stderr]),
+  stdin: generateWritableStream(stdin),
+})
+
 export const pipeAndReadStreamData = (stream, onChunk) => {
   const transform = new Transform({
     transform(chunk, enc, cb) {
