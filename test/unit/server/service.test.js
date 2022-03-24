@@ -199,6 +199,29 @@ describe('#Service', () => {
     expect(service._executeSoxCommand).toHaveBeenCalledWith(expectedArgs)
   })
 
+  test(`getBitRate() ~ Once an error occours, should return the fallback bit rate`, async () => {
+    const service = new Service()
+    const currentFile = 'file.mp3'
+    const expectedArgs = [
+      '--i',
+      '-B',
+      currentFile
+    ]
+    const childProcessMock = getSpawnResponse({
+      stderr: 'stderr',
+    })
+
+    jest.spyOn(
+      service,
+      '_executeSoxCommand'
+    ).mockReturnValue(childProcessMock)
+    
+    const getBitRateResult = await service.getBitRate(currentFile)
+
+    expect(getBitRateResult).toStrictEqual(constant.audio.fallbackBitRate)
+    expect(service._executeSoxCommand).toHaveBeenCalledWith(expectedArgs)
+  })
+
   test(`getFileInfo() ~ Should call fsPromises.access and return an object with type and path`,
     async () => {
     const expectedFileName = page.controller
