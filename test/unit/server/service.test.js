@@ -36,7 +36,7 @@ describe('#Service', () => {
     expect(executeSoxCommandResult).toStrictEqual(childProcessMock)
   })
 
-  test(`appendFxStream() ~ Should call streamPromises.pipeline, this.mergeAudioStreams, 
+  test(`appendFxStream() ~ Should call streamPromises.pipeline, service.mergeAudioStreams, 
   currentReadable.removeListener, throttleTransform.on, throttleTransform.pause and currentReadable.unpipe`, async () => {
     const currentFx = 'fx.mp3'
     const service = new Service()
@@ -101,7 +101,7 @@ describe('#Service', () => {
     expect(service.currentReadable.removeListener).toHaveBeenCalled()
   })
 
-  test(`broadCast() ~ Should interate over this.clientStreams, call stream.write, clientStreams.delete, 
+  test(`broadCast() ~ Should interate over service.clientStreams, call stream.write, clientStreams.delete, 
   cb and return a writable`, () => {
     const service = new Service()
     const onDataMock = jest.fn()
@@ -321,7 +321,35 @@ describe('#Service', () => {
     expect(service.clientStreams.delete).toHaveBeenCalledWith(id)
   })
 
-  test.todo('startStreaming() ~ ')
+  test(`startStreaming() ~ Should call service.getBitRate, service.createFileStream, 
+  streamPromises.pipeline, service.broadCast and return a readable`, async () => {
+    const service = new Service()
+    const getBitRateResultMock = '1000'
+    const readableStreamMock = generateReadableStream(['data'])
+    const writableStreamMock = generateWritableStream(()=>{})
+    const expectedStartedStream = generateReadableStream(['data'])
+    
+    jest.spyOn(
+      service,
+      'getBitRate'
+    ).mockResolvedValue(getBitRateResultMock)
+    jest.spyOn(
+      service,
+      'createFileStream'
+    ).mockReturnValue(readableStreamMock)
+    jest.spyOn(
+      streamPromises,
+      'pipeline'
+    ).mockReturnValue(expectedStartedStream)
+    jest.spyOn(
+      service,
+      'broadCast'
+    ).mockReturnValue(writableStreamMock)
+    
+    const startedStreamResult = await service.startStreaming()
+    
+    expect(startedStreamResult).toStrictEqual(expectedStartedStream)
+  })
 
   test.todo('stopStreaming() ~ ')
 
