@@ -196,14 +196,15 @@ export class Service {
   }
 
   stopStreaming() {
+    const {log} = constant
     if (!this.throttleTransform?._writableState) {
-      logger.info('Streaming not started yet.')
+      logger.info(log.service.stopStreaming.info.notStarted)
     }
     else if (!this.throttleTransform?._writableState.ended) {
       this.throttleTransform.end()
-      logger.info('Streaming stopped succesfully.')
+      logger.info(log.service.stopStreaming.info.success)
     } else {
-      logger.info('Streaming already stopped.');
+      logger.info(log.service.stopStreaming.info.alreadyStopped)
     }
   }
 

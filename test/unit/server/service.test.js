@@ -6,6 +6,7 @@ import { promises as streamPromises, Writable, PassThrough } from 'stream'
 import { generateReadableStream, generateWritableStream, getSpawnResponse } from '../../utils/testUtil.js'
 import Throttle from 'throttle'
 import childProcess from 'child_process'
+import { logger } from '../../../server/utils.js'
 
 const { page, constant } = config
 
@@ -347,11 +348,52 @@ describe('#Service', () => {
     ).mockReturnValue(writableStreamMock)
     
     const startedStreamResult = await service.startStreaming()
-    
+
     expect(startedStreamResult).toStrictEqual(expectedStartedStream)
   })
 
-  test.todo('stopStreaming() ~ ')
+  test('stopStreaming() ~ Should call service.throttleTransform.end', async() => {
+    const service = new Service()
+    const bpsMock = 1
+    service.throttleTransform = new Throttle(bpsMock)
+
+    jest.spyOn(
+      service.throttleTransform,
+      'end'
+    ).mockReturnValue()
+
+    service.stopStreaming()
+
+    expect(service.throttleTransform.end).toHaveBeenCalled()
+  })
+
+  test('stopStreaming() ~ If not started streaming, should log not started info', async() => {
+    const service = new Service()
+    
+    jest.spyOn(
+      logger,
+      'info'
+    ).mockReturnValue()
+      
+    service.stopStreaming()
+    expect(logger.info).toHaveBeenCalledWith(constant.log.service.stopStreaming.info.notStarted)
+  })
+
+  test('stopStreaming() ~ If already stopped streaming, should log already stopped info', async() => {
+    const service = new Service()
+    const bpsMock = 1
+    service.throttleTransform = new Throttle(bpsMock)
+
+    jest.spyOn(
+      logger,
+      'info'
+    ).mockReturnValue()
+    
+    service.throttleTransform.end()
+    service.stopStreaming()
+    
+    expect(logger.info).toHaveBeenCalledWith(constant.log.service.stopStreaming.info.alreadyStopped)
+  })
 
   test(`getFxFileByName() ~ Once received a unknow.mp3 file, should return a not found error`, async () => {
     const service = new Service()

@@ -102,6 +102,17 @@ export const config = {
           500: 'Internal server error'
         }
       }
+    },
+    log: {
+      service: {
+        stopStreaming: {
+          info: {
+            notStarted: 'Streaming not started yet.',
+            success: 'Streaming stopped succesfully.',
+            alreadyStopped: 'Streaming already stopped.'
+          }
+        }
+      }
     }
   }
 }
