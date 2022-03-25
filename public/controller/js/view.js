@@ -11,14 +11,27 @@ export class View {
     this.onBtnClick = null
   }
 
-  onLoad() {
-    this.toggleCommandBtnVisibility()
-    this.btnStart.onclick = this.handleBtnStartStopClick.bind(this)
-    this.btnStop.onclick = this.handleBtnStartStopClick.bind(this)
+  applyCommandBtnOnClickEffect(btn) {
+    const isActive = !!btn.classList?.contains?.(constant.className.button.active)
+    
+    if (!isActive) {
+      btn.classList.add(constant.className.button.active)
+      setTimeout(
+        () => btn.classList.remove(constant.className.button.active),
+        constant.retentionPeriod
+      )
+    }
+
   }
 
   configureOnBtnClick(fn) {
     this.onBtnClick = fn
+  }
+
+  async handleBtnCommandClick(btn) {
+    this.applyCommandBtnOnClickEffect(btn.srcElement)
+    
+    return await this.onBtnClick(btn.srcElement.innerText)
   }
 
   async handleBtnStartStopClick({
@@ -41,37 +54,12 @@ export class View {
     }
   }
 
-  toggleStartStop() {
-    const isStopped = this.btnStop.classList.contains(constant.className.button.hidden)
-
-    if (isStopped) {
-      this.btnStart.classList.add(constant.className.button.hidden)
-      this.btnStop.classList.remove(constant.className.button.hidden)
-    } else {
-      this.btnStart.classList.remove(constant.className.button.hidden)
-      this.btnStop.classList.add(constant.className.button.hidden)
-    }
+  onLoad() {
+    this.toggleCommandBtnVisibility()
+    this.btnStart.onclick = this.handleBtnStartStopClick.bind(this)
+    this.btnStop.onclick = this.handleBtnStartStopClick.bind(this)
   }
 
-  async handleBtnCommandClick(btn) {
-    this.applyCommandBtnOnClickEffect(btn.srcElement)
-    
-    return await this.onBtnClick(btn.srcElement.innerText)
-  }
-
-  applyCommandBtnOnClickEffect(btn) {
-    const isActive = !!btn.classList?.contains?.(constant.className.button.active)
-    
-    if (!isActive) {
-      btn.classList.add(constant.className.button.active)
-      setTimeout(
-        () => btn.classList.remove(constant.className.button.active),
-        constant.retentionPeriod
-      )
-    }
-
-  }
-  
   toggleCommandBtnVisibility({ visibility } = { visibility: null }) {
     this.btnCommandList.forEach((btn) => {
       const isVisible = !!visibility ?
@@ -87,6 +75,18 @@ export class View {
       }
 
     })
+  }
+
+  toggleStartStop() {
+    const isStopped = this.btnStop.classList.contains(constant.className.button.hidden)
+
+    if (isStopped) {
+      this.btnStart.classList.add(constant.className.button.hidden)
+      this.btnStop.classList.remove(constant.className.button.hidden)
+    } else {
+      this.btnStart.classList.remove(constant.className.button.hidden)
+      this.btnStop.classList.add(constant.className.button.hidden)
+    }
   }
 
 }
