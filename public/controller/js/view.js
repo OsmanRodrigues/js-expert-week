@@ -8,8 +8,7 @@ export class View {
     this.btnStart = document.getElementById(constant.id.button.start)
     this.btnStop = document.getElementById(constant.id.button.stop)
     this.btnCommandList = document.querySelectorAll(`[name=${constant.name.button.command}]`)
-    async function onBtnClick() { }
-    this.onBtnClick = onBtnClick
+    this.onBtnClick = null
   }
 
   onLoad() {
